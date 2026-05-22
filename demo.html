@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Pipeline Demo</title>
+<style>
+:root {
+  --dh-red: #D4213D;
+  --dark: #0f0f1e;
+  --darker: #0a0a16;
+  --card: #16213e;
+  --card-hover: #1a2744;
+  --green: #10b981;
+  --amber: #f59e0b;
+  --blue: #3b82f6;
+  --purple: #8b5cf6;
+  --cyan: #06b6d4;
+  --gray: #94a3b8;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --border: #1e3a5f;
+  --red-dim: rgba(212,33,61,0.15);
+  --green-dim: rgba(16,185,129,0.12);
+  --amber-dim: rgba(245,158,11,0.12);
+  --blue-dim: rgba(59,130,246,0.12);
+  --purple-dim: rgba(139,92,246,0.12);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--darker);color:var(--text);min-height:100vh;}
+
+/* HEADER */
+header{background:rgba(15,15,30,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+header .logo{font-weight:700;font-size:1rem;color:var(--dh-red);}
+header .logo span{color:var(--text);font-weight:400;}
+header a{color:var(--muted);font-size:0.8rem;text-decoration:none;}
+header a:hover{color:var(--text);}
+
+/* WIZARD PROGRESS */
+.wizard-progress{display:flex;align-items:center;justify-content:center;padding:1.5rem 2rem 0;max-width:900px;margin:0 auto;}
+.wiz-step{display:flex;align-items:center;gap:0.5rem;cursor:default;opacity:0.35;transition:all 0.3s;}
+.wiz-step.active{opacity:1;}
+.wiz-step.done{opacity:0.7;}
+.wiz-step .wiz-num{width:28px;height:28px;border-radius:50%;background:var(--card);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;transition:all 0.3s;}
+.wiz-step.active .wiz-num{border-color:var(--dh-red);background:var(--dh-red);color:#fff;}
+.wiz-step.done .wiz-num{border-color:var(--green);background:rgba(16,185,129,0.2);color:var(--green);}
+.wiz-step .wiz-label{font-size:0.75rem;font-weight:500;white-space:nowrap;}
+.wiz-connector{width:40px;height:2px;background:var(--border);margin:0 0.25rem;flex-shrink:0;}
+.wiz-step.done+.wiz-connector{background:var(--green);}
+
+/* MAIN */
+.main{max-width:1200px;margin:0 auto;padding:1.5rem 2rem 3rem;}
+.step-panel{display:none;}
+.step-panel.active{display:block;animation:fadeIn 0.3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+h1{font-size:1.8rem;font-weight:700;letter-spacing:-0.03em;margin-bottom:0.25rem;}
+h2{font-size:1.2rem;font-weight:600;margin-bottom:0.75rem;}
+h3{font-size:1rem;font-weight:600;margin-bottom:0.5rem;}
+.subtitle{color:var(--muted);font-size:0.9rem;margin-bottom:1.5rem;}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;}
+.card-sm{padding:1rem;}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
+
+/* BADGE */
+.badge{display:inline-block;padding:0.15rem 0.5rem;border-radius:99px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;}
+.b-red{background:var(--red-dim);color:var(--dh-red);}
+.b-green{background:var(--green-dim);color:var(--green);}
+.b-amber{background:var(--amber-dim);color:var(--amber);}
+.b-blue{background:var(--blue-dim);color:var(--blue);}
+.b-purple{background:var(--purple-dim);color:var(--purple);}
+.b-gray{background:rgba(148,163,184,0.15);color:var(--gray);}
+.b-cyan{background:rgba(6,182,212,0.12);color:var(--cyan);}
+
+/* METRIC */
+.metric{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;text-align:center;}
+.metric .val{font-size:1.6rem;font-weight:700;}
+.metric .lbl{font-size:0.7rem;color:var(--muted);margin-top:0.15rem;}
+.metric .delta{font-size:0.65rem;margin-top:0.15rem;font-weight:600;}
+
+/* BUTTONS */
+.btn{padding:0.55rem 1.1rem;border-radius:8px;border:none;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.btn-primary{background:var(--dh-red);color:#fff;}
+.btn-primary:hover{background:#b91c33;}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed;}
+.btn-secondary{background:var(--card);color:var(--text);border:1px solid var(--border);}
+.btn-secondary:hover{background:var(--card-hover);}
+.btn-sm{padding:0.3rem 0.7rem;font-size:0.75rem;}
+.nav-btns{display:flex;justify-content:space-between;margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border);}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:0.8rem;}
+.tbl th{text-align:left;padding:0.6rem 0.75rem;color:var(--muted);font-weight:500;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border);}
+.tbl td{padding:0.55rem 0.75rem;border-bottom:1px solid rgba(255,255,255,0.03);}
+.tbl tr:hover td{background:rgba(255,255,255,0.015);}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;}
+
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed var(--border);border-radius:16px;padding:3rem;text-align:center;cursor:pointer;transition:all 0.3s;background:rgba(22,33,62,0.3);}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--dh-red);background:rgba(212,33,61,0.05);}
+.upload-zone .icon{font-size:3rem;margin-bottom:1rem;opacity:0.6;}
+.upload-zone p{color:var(--muted);font-size:0.9rem;}
+.upload-zone .hint{font-size:0.75rem;color:var(--muted);margin-top:0.5rem;opacity:0.6;}
+input[type="file"]{display:none;}
+
+/* PROGRESS BAR */
+.prog{width:100%;height:6px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;}
+.prog .fill{height:100%;border-radius:99px;transition:width 0.6s ease;}
+
+/* TIER COLORS */
+.tier-lite{border-left:3px solid var(--gray);}
+.tier-pro{border-left:3px solid var(--blue);}
+.tier-plus{border-left:3px solid var(--purple);}
+.tier-enterprise{border-left:3px solid var(--dh-red);}
+
+/* ATTR TAGS */
+.attr{display:inline-block;padding:0.15rem 0.5rem;border-radius:5px;font-size:0.7rem;margin:0.15rem;}
+.attr-high{background:var(--green-dim);color:var(--green);}
+.attr-mid{background:var(--amber-dim);color:var(--amber);}
+.attr-miss{background:rgba(239,68,68,0.12);color:#ef4444;}
+.attr-new{background:var(--purple-dim);color:var(--purple);}
+
+/* QA */
+.qa-pass{background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:0.75rem 1rem;}
+.qa-fail{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:0.75rem 1rem;}
+
+/* PRODUCT DETAIL MODAL */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:center;justify-content:center;padding:2rem;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--dark);border:1px solid var(--border);border-radius:16px;max-width:900px;width:100%;max-height:85vh;overflow-y:auto;padding:2rem;position:relative;}
+.modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.5rem;cursor:pointer;}
+
+/* MISC */
+.flex{display:flex;}.flex-col{flex-direction:column;}.gap-1{gap:1rem;}.gap-05{gap:0.5rem;}.items-center{align-items:center;}.justify-between{justify-content:space-between;}.wrap{flex-wrap:wrap;}
+.mt-05{margin-top:0.5rem;}.mt-1{margin-top:1rem;}.mt-2{margin-top:1.5rem;}.mb-05{margin-bottom:0.5rem;}.mb-1{margin-bottom:1rem;}.mb-2{margin-bottom:1.5rem;}
+.text-sm{font-size:0.85rem;}.text-xs{font-size:0.75rem;}.text-muted{color:var(--muted);}.text-green{color:var(--green);}.text-red{color:var(--dh-red);}.text-amber{color:var(--amber);}.text-center{text-align:center;}
+.font-mono{font-family:'SF Mono','Fira Code',monospace;font-size:0.8rem;}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;}
+.dot-green{background:var(--green);box-shadow:0 0 6px var(--green);}
+.dot-amber{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.dot-red{background:var(--dh-red);box-shadow:0 0 6px var(--dh-red);}
+.clickable{cursor:pointer;}
+.clickable:hover{background:var(--card-hover);}
+
+/* REASONING BOX */
+.reason-box{background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:1rem;font-size:0.8rem;line-height:1.6;}
+.reason-box strong{color:var(--purple);}
+
+/* BAR CHART */
+.bar-chart{display:flex;align-items:flex-end;gap:0.75rem;height:150px;padding:0.5rem 0;}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:0.25rem;flex:1;}
+.bar{border-radius:4px 4px 0 0;min-width:24px;transition:height 0.6s ease;}
+.bar-label{font-size:0.65rem;color:var(--muted);}
+.bar-value{font-size:0.7rem;font-weight:600;}
+
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+@media(max-width:768px){.g2,.g3,.g4{grid-template-columns:1fr;}.wizard-progress{flex-wrap:wrap;gap:0.25rem;}.wiz-connector{width:20px;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Pipeline <span>Demo</span></div>
+  <a href="index.html">Back to Strategy Overview</a>
+</header>
+
+<!-- WIZARD PROGRESS -->
+<div class="wizard-progress" id="wizProgress">
+  <div class="wiz-step active" data-step="1"><div class="wiz-num">1</div><div class="wiz-label">Upload</div></div><div class="wiz-connector"></div>
+  <div class="wiz-step" data-step="2"><div class="wiz-num">2</div><div class="wiz-label">Tiers & ROI</div></div><div class="wiz-connector"></div>
+  <div class="wiz-step" data-step="3"><div class="wiz-num">3</div><div class="wiz-label">Model Selection</div></div><div class="wiz-connector"></div>
+  <div class="wiz-step" data-step="4"><div class="wiz-num">4</div><div class="wiz-label">Content Gen</div></div><div class="wiz-connector"></div>
+  <div class="wiz-step" data-step="5"><div class="wiz-num">5</div><div class="wiz-label">QA Gate</div></div><div class="wiz-connector"></div>
+  <div class="wiz-step" data-step="6"><div class="wiz-num">6</div><div class="wiz-label">Results</div></div>
+</div>
+
+<div class="main">
+
+<!-- ======== STEP 1: UPLOAD ======== -->
+<div class="step-panel active" id="step1">
+  <h1>Upload Product Catalog</h1>
+  <p class="subtitle">Upload a CSV file with your product data. The pipeline will process each product through tier assignment, model selection, content generation, and quality assurance.</p>
+
+  <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+    <div class="icon">&#128196;</div>
+    <p><strong>Drop your CSV here</strong> or click to browse</p>
+    <p class="hint">Expected columns: master_product_code, product_title, brand, vendor_name, vendor_tier, region, category</p>
+  </div>
+  <input type="file" id="fileInput" accept=".csv">
+
+  <div class="mt-1 text-center">
+    <button class="btn btn-secondary btn-sm" onclick="loadSampleData()">or load sample data (98 products)</button>
+  </div>
+
+  <!-- Preview -->
+  <div id="uploadPreview" style="display:none;" class="mt-2">
+    <h2>Data Preview</h2>
+    <div class="g3 mb-1">
+      <div class="metric"><div class="val" id="prevCount">0</div><div class="lbl">Products</div></div>
+      <div class="metric"><div class="val" id="prevTiers">0</div><div class="lbl">Tiers</div></div>
+      <div class="metric"><div class="val" id="prevRegions">0</div><div class="lbl">Regions</div></div>
+    </div>
+
+    <div class="g2 mb-1">
+      <div class="card card-sm">
+        <h3>Tier Distribution</h3>
+        <div class="bar-chart" id="tierChart"></div>
+      </div>
+      <div class="card card-sm">
+        <h3>Category Breakdown</h3>
+        <div class="bar-chart" id="catChart"></div>
+      </div>
+    </div>
+
+    <div class="tbl-wrap mb-1">
+      <table class="tbl" id="previewTable">
+        <thead><tr></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="nav-btns">
+      <div></div>
+      <button class="btn btn-primary" onclick="goToStep(2)">Start Pipeline &#8594;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======== STEP 2: TIERS & ROI ======== -->
+<div class="step-panel" id="step2">
+  <h1>Tier Assignment & ROI Check</h1>
+  <p class="subtitle">Each product's investment level is determined by its vendor tier. The ROI override then refines it: high-expected-return products get promoted, low-return ones are held at baseline.</p>
+
+  <div class="g4 mb-2" id="tierSummaryCards"></div>
+
+  <h2 class="mt-1">Product Assignments</h2>
+  <div class="tbl-wrap">
+    <table class="tbl" id="tierTable">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Brand</th>
+          <th>Vendor</th>
+          <th>Assigned Tier</th>
+          <th>ROI Signal</th>
+          <th>Override</th>
+          <th>Final Tier</th>
+        </tr>
+      </thead>
+      <tbody id="tierTableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="goToStep(1)">&#8592; Back</button>
+    <button class="btn btn-primary" onclick="goToStep(3)">Model Selection &#8594;</button>
+  </div>
+</div>
+
+<!-- ======== STEP 3: MODEL SELECTION ======== -->
+<div class="step-panel" id="step3">
+  <h1>Model Selection</h1>
+  <p class="subtitle">The Model Selection Agent assigns the most cost-effective model that clears the acceptance bar for each task and tier. Here's what was chosen and why.</p>
+
+  <h2>Assignment Matrix</h2>
+  <div class="tbl-wrap mb-2">
+    <table class="tbl" id="modelMatrix">
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th style="text-align:center;">Lite</th>
+          <th style="text-align:center;">Pro</th>
+          <th style="text-align:center;">Plus</th>
+          <th style="text-align:center;">Enterprise</th>
+        </tr>
+      </thead>
+      <tbody id="modelMatrixBody"></tbody>
+    </table>
+  </div>
+
+  <div class="g2 gap-1">
+    <div>
+      <h2>Selection Reasoning</h2>
+      <p class="text-xs text-muted mb-1">Click any cell in the matrix above to see the reasoning.</p>
+      <div class="reason-box" id="reasonBox">
+        <p class="text-muted">Select a task + tier combination above to see why that model was chosen.</p>
+      </div>
+    </div>
+    <div>
+      <h2>Cost Breakdown</h2>
+      <div class="tbl-wrap">
+        <table class="tbl" id="costTable">
+          <thead><tr><th>Tier</th><th>Products</th><th>Cost/Product</th><th>Total Cost</th></tr></thead>
+          <tbody id="costTableBody"></tbody>
+        </table>
+      </div>
+      <div class="metric mt-1">
+        <div class="val text-green" id="totalCost">$0.00</div>
+        <div class="lbl">Total Pipeline Cost</div>
+        <div class="delta text-muted" id="costSavings"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="goToStep(2)">&#8592; Back</button>
+    <button class="btn btn-primary" onclick="goToStep(4)">Content Generation &#8594;</button>
+  </div>
+</div>
+
+<!-- ======== STEP 4: CONTENT GENERATION ======== -->
+<div class="step-panel" id="step4">
+  <h1>Content Generation</h1>
+  <p class="subtitle">Each product is processed by the selected model. Compare raw input against generated output. Click any product for full attribute detail.</p>
+
+  <div class="flex gap-05 wrap mb-1">
+    <button class="btn btn-sm btn-primary" onclick="filterGen('all')">All</button>
+    <button class="btn btn-sm btn-secondary" onclick="filterGen('lite')">Lite</button>
+    <button class="btn btn-sm btn-secondary" onclick="filterGen('pro')">Pro</button>
+    <button class="btn btn-sm btn-secondary" onclick="filterGen('plus')">Plus</button>
+    <button class="btn btn-sm btn-secondary" onclick="filterGen('enterprise')">Enterprise</button>
+  </div>
+
+  <div class="tbl-wrap">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th style="width:30%;">Raw Title (Input)</th>
+          <th style="width:35%;">Generated Title (Output)</th>
+          <th>Tier</th>
+          <th>Model</th>
+          <th>Attributes</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody id="genTableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="goToStep(3)">&#8592; Back</button>
+    <button class="btn btn-primary" onclick="goToStep(5)">QA Gate &#8594;</button>
+  </div>
+</div>
+
+<!-- ======== STEP 5: QA GATE ======== -->
+<div class="step-panel" id="step5">
+  <h1>Inline QA Gate</h1>
+  <p class="subtitle">Every generated output is validated against acceptance criteria before publishing. Products that clear the bar auto-publish; others are flagged for review.</p>
+
+  <div class="g4 mb-2">
+    <div class="metric"><div class="val text-green" id="qaPassRate">-</div><div class="lbl">Pass Rate</div></div>
+    <div class="metric"><div class="val text-green" id="qaAutoPublish">-</div><div class="lbl">Auto-Published</div></div>
+    <div class="metric"><div class="val text-amber" id="qaFlagged">-</div><div class="lbl">Flagged for Review</div></div>
+    <div class="metric"><div class="val text-red" id="qaRejected">-</div><div class="lbl">Rejected</div></div>
+  </div>
+
+  <h2>Acceptance Criteria Checks</h2>
+  <div id="qaResults" class="flex flex-col gap-05"></div>
+
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="goToStep(4)">&#8592; Back</button>
+    <button class="btn btn-primary" onclick="goToStep(6)">Results Dashboard &#8594;</button>
+  </div>
+</div>
+
+<!-- ======== STEP 6: RESULTS ======== -->
+<div class="step-panel" id="step6">
+  <h1>Pipeline Results</h1>
+  <p class="subtitle">Complete summary of the pipeline run. Every product processed, scored, and routed.</p>
+
+  <div class="g4 mb-2">
+    <div class="metric"><div class="val" id="rTotal">-</div><div class="lbl">Total Products</div></div>
+    <div class="metric"><div class="val text-green" id="rQuality">-</div><div class="lbl">Avg Quality Score</div></div>
+    <div class="metric"><div class="val text-cyan" id="rCost">-</div><div class="lbl">Total Cost</div></div>
+    <div class="metric"><div class="val text-purple" id="rTime">-</div><div class="lbl">Avg Time/Product</div></div>
+  </div>
+
+  <div class="g2 gap-1 mb-2">
+    <div class="card">
+      <h3 class="mb-1">Quality by Tier</h3>
+      <div class="bar-chart" id="qualityByTier"></div>
+    </div>
+    <div class="card">
+      <h3 class="mb-1">Cost by Tier</h3>
+      <div class="bar-chart" id="costByTier"></div>
+    </div>
+  </div>
+
+  <h2>Variant Groups Detected</h2>
+  <p class="text-xs text-muted mb-1">Products grouped by (brand, generic_name) that likely represent the same core product in different sizes or flavors.</p>
+  <div id="variantGroups" class="flex flex-col gap-05 mb-2"></div>
+
+  <h2>Full Product Report</h2>
+  <div class="tbl-wrap">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Tier</th>
+          <th>Model</th>
+          <th>Quality</th>
+          <th>QA</th>
+          <th>Cost</th>
+          <th>Route</th>
+        </tr>
+      </thead>
+      <tbody id="reportTableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="goToStep(5)">&#8592; Back</button>
+    <a href="index.html" class="btn btn-primary" style="text-decoration:none;">View Full Strategy &#8594;</a>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- PRODUCT DETAIL MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+let products = [];
+let processed = [];
+let currentStep = 1;
+
+const TIER_ORDER = ['lite','pro','plus','enterprise'];
+const TIER_COLORS = {lite:'var(--gray)',pro:'var(--blue)',plus:'var(--purple)',enterprise:'var(--dh-red)'};
+const TIER_LABELS = {lite:'Lite',pro:'Pro',plus:'Plus',enterprise:'Enterprise'};
+const CAT_LABELS = {
+  packaged_food_beverages:'Food & Bev',
+  packaged_non_food:'Non-Food',
+  ultrafresh_loose_food_beverages:'UltraFresh',
+  electronics:'Electronics',
+  pharmaceuticals:'Pharma',
+  smoking_tobacco:'Tobacco',
+  general_merchandise:'General'
+};
+
+const MODEL_DB = {
+  'DH-Title-v3':    {type:'Fine-tuned',cost:0.001,latency:180,quality:65,color:'var(--gray)'},
+  'Gemini 2.5 Flash':{type:'External',cost:0.002,latency:350,quality:68,color:'var(--cyan)'},
+  'GPT-4.1-mini':   {type:'External',cost:0.003,latency:420,quality:74,color:'var(--blue)'},
+  'Claude 4 Haiku': {type:'External',cost:0.005,latency:380,quality:78,color:'var(--green)'},
+  'Claude 4 Sonnet':{type:'External',cost:0.015,latency:620,quality:91,color:'var(--purple)'},
+  'GPT-4.1':        {type:'External',cost:0.030,latency:890,quality:94,color:'var(--dh-red)'},
+};
+
+const MODEL_ASSIGN = {
+  'Title Generation':    {lite:'DH-Title-v3',pro:'GPT-4.1-mini',plus:'Claude 4 Sonnet',enterprise:'GPT-4.1'},
+  'Attribute Extraction':{lite:'DH-Title-v3',pro:'Gemini 2.5 Flash',plus:'Claude 4 Sonnet',enterprise:'GPT-4.1'},
+  'Category Prediction': {lite:'DH-Title-v3',pro:'DH-Title-v3',plus:'GPT-4.1-mini',enterprise:'Claude 4 Sonnet'},
+  'Variant Grouping':    {lite:null,pro:'GPT-4.1-mini',plus:'Claude 4 Sonnet',enterprise:'GPT-4.1'},
+};
+
+const MODEL_REASONS = {
+  'Title Generation': {
+    lite: '<strong>DH-Title-v3</strong> selected for Lite Title Generation.<br><br><strong>Why:</strong> Clears the 60% acceptance bar (65% actual). Lowest cost at $0.001/product among eligible models. Meets 500ms latency SLA (180ms actual). Lite tier optimizes for minimum cost that clears the bar.',
+    pro: '<strong>GPT-4.1-mini</strong> selected for Pro Title Generation.<br><br><strong>Why:</strong> Clears the 70% acceptance bar (74% actual). Cost of $0.003/product is 40% cheaper than Claude Haiku while scoring within 4 points. Pro tier optimizes for cost subject to clearing the bar. Gemini Flash was considered but fell below the 70% threshold for titles.',
+    plus: '<strong>Claude 4 Sonnet</strong> selected for Plus Title Generation.<br><br><strong>Why:</strong> Highest quality (91%) among models that meet the 620ms latency SLA. Plus tier optimizes for accuracy, not cost. GPT-4.1 scores higher (94%) but exceeds the latency SLA at 890ms. Claude Sonnet is the best accuracy/latency trade-off.',
+    enterprise: '<strong>GPT-4.1</strong> selected for Enterprise Title Generation.<br><br><strong>Why:</strong> Best-available quality at 94%. Enterprise tier has a relaxed latency SLA (1000ms) to allow for the best model. Strategic partner content must match or exceed the partner\'s own listing quality. No cost constraint at this tier.'
+  },
+  'Attribute Extraction': {
+    lite: '<strong>DH-Title-v3</strong> selected for Lite Attribute Extraction.<br><br><strong>Why:</strong> Extracts only baseline attributes (brand, category, size). Cheapest option at $0.001. Sufficient for hygiene-level content. Complex attributes skipped at Lite tier.',
+    pro: '<strong>Gemini 2.5 Flash</strong> selected for Pro Attribute Extraction.<br><br><strong>Why:</strong> Strong structured extraction at $0.002/product. Category-level guidelines enabled. Extracts flavor, scent, fat content, and dietary flags. Lowest cost among models that handle structured attribute schemas.',
+    plus: '<strong>Claude 4 Sonnet</strong> selected for Plus Attribute Extraction.<br><br><strong>Why:</strong> 91% accuracy on attribute extraction benchmarks. Handles nuanced attributes (country_of_origin from image text, strength for pharma). Full granular guidelines applied. Accuracy-optimized selection.',
+    enterprise: '<strong>GPT-4.1</strong> selected for Enterprise Attribute Extraction.<br><br><strong>Why:</strong> 94% accuracy with best-in-class multimodal extraction. Extracts all 20+ attribute fields including dietary certifications and storage instructions. Trust-class validation enabled. Best-available model policy.'
+  },
+  'Category Prediction': {
+    lite: '<strong>DH-Title-v3</strong> selected for Lite Category Prediction.<br><br><strong>Why:</strong> Fine-tuned on DH category taxonomy. 89% accuracy on top-level category mapping. $0.001/product. Category prediction is well-suited to fine-tuned models because the label space is fixed.',
+    pro: '<strong>DH-Title-v3</strong> selected for Pro Category Prediction.<br><br><strong>Why:</strong> Same as Lite. Fine-tuned model matches general-purpose models for category prediction at 10x lower cost. Category taxonomy doesn\'t change by tier.',
+    plus: '<strong>GPT-4.1-mini</strong> selected for Plus Category Prediction.<br><br><strong>Why:</strong> Master category prediction at L3 depth requires reasoning about product characteristics. GPT-4.1-mini handles subcategory distinctions (e.g., UHT Milk vs Fresh Milk) that the fine-tuned model misses. $0.003/product.',
+    enterprise: '<strong>Claude 4 Sonnet</strong> selected for Enterprise Category Prediction.<br><br><strong>Why:</strong> L3-depth master category with 91% accuracy. Enterprise products need precise categorization for partner catalog matching. Claude Sonnet\'s reasoning handles edge cases (is this product Beverages > Juice or Food > Dessert?).'
+  },
+  'Variant Grouping': {
+    lite: '<em>Not available at Lite tier.</em><br><br><strong>Why:</strong> Variant grouping is not cost-justified for single-vendor, low-volume products. These products exist to be discoverable, not conversion-optimized.',
+    pro: '<strong>GPT-4.1-mini</strong> selected for Pro Variant Grouping.<br><br><strong>Why:</strong> Light variant pass groups products by (brand, generic_name). GPT-4.1-mini handles the matching at $0.003/group. Pro tier gets basic variant grouping but not full dedup.',
+    plus: '<strong>Claude 4 Sonnet</strong> selected for Plus Variant Grouping.<br><br><strong>Why:</strong> Full variant and dedup pass. Claude Sonnet distinguishes genuine variants (Coca-Cola 330ml vs 500ml) from different products (Coca-Cola Original vs Coca-Cola Zero). Handles multi-attribute variant axes (size + flavor).',
+    enterprise: '<strong>GPT-4.1</strong> selected for Enterprise Variant Grouping.<br><br><strong>Why:</strong> Best-available model for complex variant resolution. Handles cross-language variant matching, unit normalization, and pack-size decomposition. Enterprise products need variant groups that match the partner\'s own product hierarchy.'
+  }
+};
+
+const TIER_COSTS = {lite:0.003,pro:0.011,plus:0.045,enterprise:0.090};
+
+// ===== CSV PARSING =====
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.trim());
+  return lines.slice(1).filter(l => l.trim()).map(line => {
+    const vals = [];
+    let current = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] === '"') { inQuotes = !inQuotes; }
+      else if (line[i] === ',' && !inQuotes) { vals.push(current.trim()); current = ''; }
+      else { current += line[i]; }
+    }
+    vals.push(current.trim());
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = vals[i] || '');
+    return obj;
+  });
+}
+
+// ===== UPLOAD =====
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+});
+fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+function handleFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    products = parseCSV(e.target.result);
+    processProducts();
+    showPreview();
+  };
+  reader.readAsText(file);
+}
+
+function loadSampleData() {
+  const csv = `master_product_code,product_title,image_url,brand,vendor_name,vendor_tier,region,category,master_category
+MPC-100001,almarai full fat milk 1L,https://images.deliveryhero.io/image/dh/almarai-milk-1l.jpg,Almarai,Al-Maha Mini Market,lite,ae,packaged_food_beverages,
+MPC-100002,PEPSI CAN 330 ML,https://images.deliveryhero.io/image/dh/pepsi-330ml.jpg,Pepsi,Corner Mart Riyadh,lite,sa,packaged_food_beverages,
+MPC-100003,tide liquid 3l orignal,https://images.deliveryhero.io/image/dh/tide-3l.jpg,Tide,Quick Stop Lahore,lite,pk,packaged_non_food,
+MPC-100004,lays salt chips 170g,https://images.deliveryhero.io/image/dh/lays-salt-170g.jpg,Lay's,Baqala Express,lite,ae,packaged_food_beverages,
+MPC-100005,panadol extra 500mg tabs 24,https://images.deliveryhero.io/image/dh/panadol-500mg.jpg,Panadol,Corner Mart Riyadh,lite,sa,pharmaceuticals,
+MPC-100006,samsung charger usbc 25w,https://images.deliveryhero.io/image/dh/samsung-charger-25w.jpg,Samsung,Quick Stop Lahore,lite,pk,electronics,
+MPC-100007,almarai laban full fat 1L,https://images.deliveryhero.io/image/dh/almarai-laban-1l.jpg,Almarai,Baqala Express,lite,ae,packaged_food_beverages,
+MPC-100008,aquafina water 500ml,https://images.deliveryhero.io/image/dh/aquafina-500ml.jpg,Aquafina,Corner Mart Riyadh,lite,sa,packaged_food_beverages,
+MPC-100009,downy fabric softner 1l blue,https://images.deliveryhero.io/image/dh/downy-1l.jpg,Downy,Quick Stop Lahore,lite,pk,packaged_non_food,
+MPC-100010,lipton yellow label tea 100bags,https://images.deliveryhero.io/image/dh/lipton-100bags.jpg,Lipton,Baqala Express,lite,ae,packaged_food_beverages,
+MPC-100011,puck cream cheese 240g,https://images.deliveryhero.io/image/dh/puck-240g.jpg,Puck,Corner Mart Riyadh,lite,sa,packaged_food_beverages,
+MPC-100012,nescafe classic 200g jar,https://images.deliveryhero.io/image/dh/nescafe-200g.jpg,Nescafe,Quick Stop Lahore,lite,pk,packaged_food_beverages,
+MPC-100013,DETTOL SOAP BAR 120G,https://images.deliveryhero.io/image/dh/dettol-soap-120g.jpg,Dettol,Baqala Express,lite,ae,packaged_non_food,
+MPC-100014,al kabeer chicken nuggets 400g,https://images.deliveryhero.io/image/dh/alkabeer-nuggets.jpg,Al Kabeer,Corner Mart Riyadh,lite,sa,packaged_food_beverages,
+MPC-100015,vimto cordial 710ml,https://images.deliveryhero.io/image/dh/vimto-710ml.jpg,Vimto,Baqala Express,lite,ae,packaged_food_beverages,
+MPC-100016,indomie instant noodls chicken 5x75g,https://images.deliveryhero.io/image/dh/indomie-5x75g.jpg,Indomie,Quick Stop Lahore,lite,pk,packaged_food_beverages,
+MPC-100017,rani juice mango 240ml,https://images.deliveryhero.io/image/dh/rani-mango-240ml.jpg,Rani,Baqala Express,lite,ae,packaged_food_beverages,
+MPC-100018,nutella hazelnut spred 350g,https://images.deliveryhero.io/image/dh/nutella-350g.jpg,Nutella,Corner Mart Riyadh,lite,sa,packaged_food_beverages,
+MPC-200001,almarai full fat milk 2L,https://images.deliveryhero.io/image/dh/almarai-milk-2l.jpg,Almarai,FreshMart Regional,pro,ae,packaged_food_beverages,
+MPC-200002,coca cola zero sugar 330ml can,https://images.deliveryhero.io/image/dh/coke-zero-330ml.jpg,Coca-Cola,FreshMart Regional,pro,ae,packaged_food_beverages,
+MPC-200003,fairy dish wash lemon 1L,https://images.deliveryhero.io/image/dh/fairy-lemon-1l.jpg,Fairy,GrocerPro SA,pro,sa,packaged_non_food,
+MPC-200004,doritos nacho cheese tortilla chips 180g,https://images.deliveryhero.io/image/dh/doritos-180g.jpg,Doritos,FreshMart Regional,pro,ae,packaged_food_beverages,
+MPC-200005,nido fortified milk powder 900g,https://images.deliveryhero.io/image/dh/nido-900g.jpg,Nido,GrocerPro SA,pro,sa,packaged_food_beverages,
+MPC-200006,dettol antiseptic liquid 500ml,https://images.deliveryhero.io/image/dh/dettol-500ml.jpg,Dettol,FreshMart Regional,pro,ae,packaged_non_food,
+MPC-200007,red bull energy drink 250ml,https://images.deliveryhero.io/image/dh/redbull-250ml.jpg,Red Bull,GrocerPro SA,pro,sa,packaged_food_beverages,
+MPC-200008,colgate max fresh 100ml cool mint,https://images.deliveryhero.io/image/dh/colgate-100ml.jpg,Colgate,FreshMart Regional,pro,ae,packaged_non_food,
+MPC-200009,nadec long life milk full fat 1L,https://images.deliveryhero.io/image/dh/nadec-milk-1l.jpg,Nadec,GrocerPro SA,pro,sa,packaged_food_beverages,
+MPC-200010,sprite lemon lime 330ml can,https://images.deliveryhero.io/image/dh/sprite-330ml.jpg,Sprite,FreshMart Regional,pro,ae,packaged_food_beverages,
+MPC-200011,head and shoulders shampoo 400ml antidandruf,https://images.deliveryhero.io/image/dh/headshoulders-400ml.jpg,Head & Shoulders,GrocerPro SA,pro,sa,packaged_non_food,
+MPC-200012,maggi chicken noodles 77g 5 pack,https://images.deliveryhero.io/image/dh/maggi-5x77g.jpg,Maggi,FreshMart Regional,pro,ae,packaged_food_beverages,
+MPC-200013,al ain water 1.5L,https://images.deliveryhero.io/image/dh/alain-1.5l.jpg,Al Ain,FreshMart Regional,pro,ae,packaged_food_beverages,
+MPC-200014,philadelphia cream cheese 200g orignal,https://images.deliveryhero.io/image/dh/philadelphia-200g.jpg,Philadelphia,GrocerPro SA,pro,sa,packaged_food_beverages,
+MPC-200015,persil powder detergent 3kg,https://images.deliveryhero.io/image/dh/persil-3kg.jpg,Persil,GrocerPro SA,pro,sa,packaged_non_food,
+MPC-200016,kinder bueno milk chocolate bar 43g,https://images.deliveryhero.io/image/dh/kinder-bueno-43g.jpg,Kinder,FreshMart Regional,pro,ae,packaged_food_beverages,
+MPC-200017,tang orange powder drink 375g,https://images.deliveryhero.io/image/dh/tang-375g.jpg,Tang,GrocerPro SA,pro,sa,packaged_food_beverages,
+MPC-200018,pampers baby dry size 4 44 diapers,https://images.deliveryhero.io/image/dh/pampers-s4-44.jpg,Pampers,FreshMart Regional,pro,ae,packaged_non_food,
+MPC-300001,almarai full fat milk 500ml,https://images.deliveryhero.io/image/dh/almarai-milk-500ml.jpg,Almarai,Carrefour Express,plus,ae,packaged_food_beverages,
+MPC-300002,coca cola original 330ml 6 pack,https://images.deliveryhero.io/image/dh/coke-6pack.jpg,Coca-Cola,Carrefour Express,plus,ae,packaged_food_beverages,
+MPC-300003,ariel automatic wash powder 2.5kg original,https://images.deliveryhero.io/image/dh/ariel-2.5kg.jpg,Ariel,Panda Supermarket,plus,sa,packaged_non_food,
+MPC-300004,kitkat chunky milk chocolate 40g,https://images.deliveryhero.io/image/dh/kitkat-40g.jpg,KitKat,Carrefour Express,plus,ae,packaged_food_beverages,
+MPC-300005,nadec fresh chicken whole 1kg,https://images.deliveryhero.io/image/dh/nadec-chicken-1kg.jpg,Nadec,Panda Supermarket,plus,sa,ultrafresh_loose_food_beverages,
+MPC-300006,apple lightning cable 1m white,https://images.deliveryhero.io/image/dh/apple-cable-1m.jpg,Apple,Carrefour Express,plus,ae,electronics,
+MPC-300007,red bull sugar free 250ml,https://images.deliveryhero.io/image/dh/redbull-sf-250ml.jpg,Red Bull,Panda Supermarket,plus,sa,packaged_food_beverages,
+MPC-300008,nivea body lotion cocoa butter 400ml,https://images.deliveryhero.io/image/dh/nivea-400ml.jpg,Nivea,Carrefour Express,plus,ae,packaged_non_food,
+MPC-300009,lurpak butter unsalted 200g,https://images.deliveryhero.io/image/dh/lurpak-200g.jpg,Lurpak,Panda Supermarket,plus,sa,packaged_food_beverages,
+MPC-300010,fanta orange 330ml can,https://images.deliveryhero.io/image/dh/fanta-330ml.jpg,Fanta,Carrefour Express,plus,ae,packaged_food_beverages,
+MPC-300011,dove beauty cream bar soap 135g,https://images.deliveryhero.io/image/dh/dove-135g.jpg,Dove,Panda Supermarket,plus,sa,packaged_non_food,
+MPC-300012,philadelphia cream cheese light 200g,https://images.deliveryhero.io/image/dh/philly-light-200g.jpg,Philadelphia,Carrefour Express,plus,ae,packaged_food_beverages,
+MPC-300013,samsung galaxy a15 phone case black,https://images.deliveryhero.io/image/dh/samsung-a15-case.jpg,Samsung,Panda Supermarket,plus,sa,electronics,
+MPC-300014,nescafe gold blend instant cofee 100g,https://images.deliveryhero.io/image/dh/nescafe-gold-100g.jpg,Nescafe,Carrefour Express,plus,ae,packaged_food_beverages,
+MPC-300015,pampers premium care size 3 80 diapers,https://images.deliveryhero.io/image/dh/pampers-pc-s3-80.jpg,Pampers,Panda Supermarket,plus,sa,packaged_non_food,
+MPC-300016,almarai juice mixed fruit 1L,https://images.deliveryhero.io/image/dh/almarai-juice-1l.jpg,Almarai,Carrefour Express,plus,ae,packaged_food_beverages,
+MPC-300017,danone activia yogurt strawberry 120g 4 pack,https://images.deliveryhero.io/image/dh/activia-4x120g.jpg,Danone,Panda Supermarket,plus,sa,packaged_food_beverages,
+MPC-300018,cadbury dairy milk chocolate 200g,https://images.deliveryhero.io/image/dh/cadbury-200g.jpg,Cadbury,Carrefour Express,plus,ae,packaged_food_beverages,
+MPC-300019,pringles original chips 165g,https://images.deliveryhero.io/image/dh/pringles-165g.jpg,Pringles,Carrefour Express,plus,ae,packaged_food_beverages,
+MPC-300020,comfort fabric conditioner blue 2L,https://images.deliveryhero.io/image/dh/comfort-2l.jpg,Comfort,Panda Supermarket,plus,sa,packaged_non_food,
+MPC-400001,almarai low fat milk 1L,https://images.deliveryhero.io/image/dh/almarai-lowfat-1l.jpg,Almarai,Carrefour Hypermarket,enterprise,ae,packaged_food_beverages,
+MPC-400002,coca cola original taste 330ml can,https://images.deliveryhero.io/image/dh/coke-original-330ml.jpg,Coca-Cola,Carrefour Hypermarket,enterprise,ae,packaged_food_beverages,
+MPC-400003,persil power gel 3l lavender,https://images.deliveryhero.io/image/dh/persil-gel-3l.jpg,Persil,Carrefour Hypermarket,enterprise,ae,packaged_non_food,
+MPC-400004,galaxy smooth milk choclate bar 90g,https://images.deliveryhero.io/image/dh/galaxy-90g.jpg,Galaxy,Carrefour Hypermarket,enterprise,ae,packaged_food_beverages,
+MPC-400005,fresh local tomatoes per kg,https://images.deliveryhero.io/image/dh/tomatoes-1kg.jpg,Local Farm,Carrefour Hypermarket,enterprise,ae,ultrafresh_loose_food_beverages,
+MPC-400006,samsung galaxy buds3 pro wireless earbuds,https://images.deliveryhero.io/image/dh/galaxy-buds3.jpg,Samsung,Carrefour Hypermarket,enterprise,ae,electronics,
+MPC-400007,almarai full fat milk 3L,https://images.deliveryhero.io/image/dh/almarai-milk-3l.jpg,Almarai,Carrefour Hypermarket,enterprise,ae,packaged_food_beverages,
+MPC-400008,coca cola zero sugar 330ml 6 pack,https://images.deliveryhero.io/image/dh/coke-zero-6pack.jpg,Coca-Cola,Carrefour Hypermarket,enterprise,ae,packaged_food_beverages,
+MPC-400009,fairy platinum dishwasher tabs 30 pack,https://images.deliveryhero.io/image/dh/fairy-plat-30.jpg,Fairy,Carrefour Hypermarket,enterprise,ae,packaged_non_food,
+MPC-400010,lindt excellence dark chocolate 85% 100g,https://images.deliveryhero.io/image/dh/lindt-85-100g.jpg,Lindt,Carrefour Hypermarket,enterprise,ae,packaged_food_beverages,
+MPC-400011,fresh bananas per kg,https://images.deliveryhero.io/image/dh/bananas-1kg.jpg,Imported,Carrefour Hypermarket,enterprise,ae,ultrafresh_loose_food_beverages,
+MPC-400012,apple usb-c charger 20w,https://images.deliveryhero.io/image/dh/apple-charger-20w.jpg,Apple,Carrefour Hypermarket,enterprise,ae,electronics,
+MPC-400013,almarai fresh juice orange 1.5L,https://images.deliveryhero.io/image/dh/almarai-oj-1.5l.jpg,Almarai,Carrefour Hypermarket,enterprise,ae,packaged_food_beverages,
+MPC-400014,evian natural mineral water 1.5L,https://images.deliveryhero.io/image/dh/evian-1.5l.jpg,Evian,Carrefour Hypermarket,enterprise,ae,packaged_food_beverages,
+MPC-400015,loreal paris elvive shampoo 400ml color protect,https://images.deliveryhero.io/image/dh/loreal-elvive-400ml.jpg,L'Oreal,Carrefour Hypermarket,enterprise,ae,packaged_non_food,
+MPC-400016,red bull energy drink 250ml 4 pack,https://images.deliveryhero.io/image/dh/redbull-4pack.jpg,Red Bull,Carrefour Hypermarket,enterprise,ae,packaged_food_beverages,
+MPC-400017,lurpak butter salted 200g block,https://images.deliveryhero.io/image/dh/lurpak-salted-200g.jpg,Lurpak,Carrefour Hypermarket,enterprise,ae,packaged_food_beverages,
+MPC-400018,pringles sour cream onion 165g,https://images.deliveryhero.io/image/dh/pringles-sc-165g.jpg,Pringles,Carrefour Hypermarket,enterprise,ae,packaged_food_beverages,
+MPC-400019,voltaren emulgel 100g anti inflammatory,https://images.deliveryhero.io/image/dh/voltaren-100g.jpg,Voltaren,Carrefour Hypermarket,enterprise,ae,pharmaceuticals,
+MPC-400020,nescafe dolce gusto cappuccino 16 caps,https://images.deliveryhero.io/image/dh/dolce-gusto-16.jpg,Nescafe,Carrefour Hypermarket,enterprise,ae,packaged_food_beverages,
+MPC-400021,samsung 25w travel adapter usb-c white,https://images.deliveryhero.io/image/dh/samsung-25w-adapter.jpg,Samsung,Carrefour Hypermarket,enterprise,ae,electronics,
+MPC-400022,cadbury dairy milk fruit and nut 230g,https://images.deliveryhero.io/image/dh/cadbury-fn-230g.jpg,Cadbury,Carrefour Hypermarket,enterprise,ae,packaged_food_beverages,
+MPC-400023,dove body wash deeply nourishing 500ml,https://images.deliveryhero.io/image/dh/dove-bodywash-500ml.jpg,Dove,Carrefour Hypermarket,enterprise,ae,packaged_non_food,
+MPC-400024,doritos cool ranch 180g,https://images.deliveryhero.io/image/dh/doritos-ranch-180g.jpg,Doritos,Carrefour Hypermarket,enterprise,ae,packaged_food_beverages,
+MPC-400025,fresh cucumber per kg,https://images.deliveryhero.io/image/dh/cucumber-1kg.jpg,Local Farm,Carrefour Hypermarket,enterprise,ae,ultrafresh_loose_food_beverages,
+MPC-500001,susu ultra mimi coklat 125ml,https://images.deliveryhero.io/image/dh/ultramimi-125ml.jpg,Ultra Mimi,Warung Pak Adi,lite,id,packaged_food_beverages,
+MPC-500002,indomie goreng original 85g,https://images.deliveryhero.io/image/dh/indomie-goreng-85g.jpg,Indomie,Warung Pak Adi,lite,id,packaged_food_beverages,
+MPC-500003,ABC kecap manis 600ml,https://images.deliveryhero.io/image/dh/abc-kecap-600ml.jpg,ABC,Warung Pak Adi,lite,id,packaged_food_beverages,
+MPC-500004,so klin lantai cherry blossom 800ml,https://images.deliveryhero.io/image/dh/soklin-800ml.jpg,So Klin,Warung Pak Adi,lite,id,packaged_non_food,
+MPC-500005,le minerale 600ml,https://images.deliveryhero.io/image/dh/leminerale-600ml.jpg,Le Minerale,Warung Pak Adi,lite,id,packaged_food_beverages,
+MPC-500006,marlboro red 20s,https://images.deliveryhero.io/image/dh/marlboro-red-20.jpg,Marlboro,Warung Pak Adi,lite,id,smoking_tobacco,
+MPC-600001,juhayna full cream milk 1L,https://images.deliveryhero.io/image/dh/juhayna-1l.jpg,Juhayna,Metro Market Cairo,pro,eg,packaged_food_beverages,
+MPC-600002,coca cola 330ml can,https://images.deliveryhero.io/image/dh/coke-330ml-eg.jpg,Coca-Cola,Metro Market Cairo,pro,eg,packaged_food_beverages,
+MPC-600003,persil gel power 1L,https://images.deliveryhero.io/image/dh/persil-1l-eg.jpg,Persil,Metro Market Cairo,pro,eg,packaged_non_food,
+MPC-600004,chipsy cheese 70g,https://images.deliveryhero.io/image/dh/chipsy-70g.jpg,Chipsy,Metro Market Cairo,pro,eg,packaged_food_beverages,
+MPC-600005,domty white cheese 500g,https://images.deliveryhero.io/image/dh/domty-500g.jpg,Domty,Metro Market Cairo,pro,eg,packaged_food_beverages,
+MPC-700001,almarai skimmed milk 1L,https://images.deliveryhero.io/image/dh/almarai-skim-1l.jpg,Almarai,Lulu Hypermarket,plus,ae,packaged_food_beverages,
+MPC-700002,pepsi max zero sugar 330ml 6 pack,https://images.deliveryhero.io/image/dh/pepsi-max-6pack.jpg,Pepsi,Lulu Hypermarket,plus,ae,packaged_food_beverages,
+MPC-700003,omo auto liquid detergent 2L,https://images.deliveryhero.io/image/dh/omo-2l.jpg,Omo,Lulu Hypermarket,plus,ae,packaged_non_food,
+MPC-700004,toblerone milk chocolate 100g,https://images.deliveryhero.io/image/dh/toblerone-100g.jpg,Toblerone,Lulu Hypermarket,plus,ae,packaged_food_beverages,
+MPC-700005,fresh strawberries 250g pack,https://images.deliveryhero.io/image/dh/strawberries-250g.jpg,Local Farm,Lulu Hypermarket,plus,ae,ultrafresh_loose_food_beverages,
+MPC-700006,braun series 5 shaver,https://images.deliveryhero.io/image/dh/braun-s5.jpg,Braun,Lulu Hypermarket,plus,ae,electronics,`;
+  products = parseCSV(csv);
+  processProducts();
+  showPreview();
+}
+
+// ===== PROCESS PRODUCTS =====
+function processProducts() {
+  processed = products.map((p, idx) => {
+    const tier = (p.vendor_tier || 'lite').toLowerCase();
+    const cat = p.category || 'packaged_food_beverages';
+    const roi = computeROI(p, idx);
+    const finalTier = roi.override ? roi.newTier : tier;
+    const titleModel = MODEL_ASSIGN['Title Generation'][finalTier];
+    const genTitle = generateTitle(p, finalTier);
+    const attrs = extractAttributes(p, finalTier);
+    const qaResult = runQA(genTitle, attrs, finalTier, p);
+    const cost = TIER_COSTS[finalTier];
+    const quality = computeQuality(attrs, genTitle, finalTier);
+    const time = {lite:0.8,pro:1.4,plus:2.6,enterprise:4.2}[finalTier];
+
+    return {
+      ...p,
+      originalTier: tier,
+      roi,
+      finalTier,
+      titleModel,
+      generatedTitle: genTitle,
+      attributes: attrs,
+      qa: qaResult,
+      cost,
+      quality,
+      time,
+    };
+  });
+}
+
+function computeROI(p, idx) {
+  const tier = (p.vendor_tier || 'lite').toLowerCase();
+  const brand = (p.brand || '').toLowerCase();
+  const cat = (p.category || '').toLowerCase();
+  const highValueBrands = ['almarai','coca-cola','samsung','apple','red bull','nestlé','nestle'];
+  const lowValueBrands = ['local farm','imported','ultra mimi','so klin','le minerale','chipsy','domty','vimto','rani','al kabeer'];
+  const isHighValue = highValueBrands.includes(brand);
+  const isLowValue = lowValueBrands.includes(brand);
+
+  const promoted = isHighValue && (tier === 'lite' || tier === 'pro');
+  const downgraded = (tier === 'plus' || tier === 'enterprise') && (isLowValue || (cat.includes('ultrafresh') && idx % 3 === 0) || (!isHighValue && idx % 7 === 0));
+
+  if (promoted) {
+    const newTier = tier === 'lite' ? 'pro' : 'plus';
+    return {
+      signal: 'High',
+      reason: `Similar-product performance indicates high expected ROI for ${p.brand} in ${(p.region||'ae').toUpperCase()}. Brand is a top seller in category.`,
+      override: true,
+      direction: 'promoted',
+      newTier
+    };
+  }
+  if (downgraded) {
+    const newTier = tier === 'enterprise' ? 'plus' : 'pro';
+    const reasons = [];
+    if (isLowValue) reasons.push(`${p.brand} shows low similar-product performance in ${(p.region||'ae').toUpperCase()}`);
+    else if (cat.includes('ultrafresh')) reasons.push(`UltraFresh products have short shelf life and low repeat-purchase signal`);
+    else reasons.push(`Low similar-product performance for this brand/category combination`);
+    reasons.push(`Downgrading from ${TIER_LABELS[tier]} to ${TIER_LABELS[newTier]} saves $${(TIER_COSTS[tier] - TIER_COSTS[newTier]).toFixed(3)}/product without meaningful conversion loss.`);
+    return {
+      signal: 'Low',
+      reason: reasons.join('. '),
+      override: true,
+      direction: 'downgraded',
+      newTier
+    };
+  }
+  return {
+    signal: 'Medium',
+    reason: `Expected return aligns with ${TIER_LABELS[tier]} tier investment. No override needed.`,
+    override: false,
+    direction: 'none',
+    newTier: tier
+  };
+}
+
+function generateTitle(p, tier) {
+  const raw = p.product_title || '';
+  let parts = raw.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+  let title = parts.join(' ');
+
+  const brand = p.brand || '';
+  if (brand && !title.toLowerCase().startsWith(brand.toLowerCase())) {
+    title = title.replace(new RegExp(brand, 'i'), '').trim();
+    title = brand + ' ' + title;
+  }
+  title = title.replace(/\s+/g, ' ').trim();
+
+  if (tier === 'plus' || tier === 'enterprise') {
+    if (/\d+\s*(ml|l|g|kg)/i.test(raw) && !/\d+\s*(ml|L|g|kg|Ml|ML)/i.test(title)) {
+      title = title.replace(/(\d+)\s*(ml|l|g|kg)/gi, (_, n, u) => `${n}${u.charAt(0).toUpperCase()}${u.slice(1).toLowerCase()}`);
+    }
+  }
+
+  if (tier === 'enterprise') {
+    const cat = (p.category || '').toLowerCase();
+    if (cat.includes('food') || cat.includes('beverage')) {
+      if (!/piece|pack|unit/i.test(title) && /^\d+$/.test('' + 1)) {
+        title += ' - 1 Piece';
+      }
+    }
+  }
+
+  return title;
+}
+
+function extractAttributes(p, tier) {
+  const raw = p.product_title || '';
+  const brand = p.brand || '';
+  const cat = p.category || '';
+
+  const sizeMatch = raw.match(/(\d+(?:\.\d+)?)\s*(ml|l|g|kg|mg|tablets?|capsules?|sheets?|pcs?|m)\b/i);
+  const packMatch = raw.match(/(\d+)\s*(?:x|pack|cans?)\b/i);
+  const flavorWords = ['original','lemon','coconut','mint','lavender','chocolate','strawberry','vanilla','nacho cheese','salt','cool mint','cocoa butter'];
+  const flavorMatch = flavorWords.find(f => raw.toLowerCase().includes(f));
+  const fatMatch = raw.match(/(full fat|low fat|fat free|skimmed|semi[\s-]?skimmed|\d+(?:\.\d+)?%\s*fat)/i);
+  const colorMatch = raw.match(/\b(white|black|red|blue|green|silver|gold)\b/i);
+
+  const conf = {lite:0.65,pro:0.78,plus:0.91,enterprise:0.95}[tier];
+  const confLow = conf * 0.7;
+
+  const attrs = {
+    brand: {value: brand, score: brand ? conf + 0.04 : 0},
+    generic_name: {value: extractGenericName(raw, brand), score: conf},
+    category: {value: CAT_LABELS[cat] || cat, score: conf + 0.02},
+    content_value: sizeMatch ? {value: sizeMatch[1], score: conf} : {value: '', score: 0},
+    content_unit: sizeMatch ? {value: sizeMatch[2], score: conf} : {value: '', score: 0},
+    item_size: sizeMatch ? {value: sizeMatch[0], score: conf} : {value: '', score: 0},
+    number_of_units_per_pack: packMatch ? {value: parseInt(packMatch[1]), score: conf} : {value: 1, score: confLow},
+    flavor: {value: flavorMatch || '', score: flavorMatch ? conf * 0.95 : 0},
+    fat: fatMatch ? {value: fatMatch[1], score: conf * 0.9} : {value: '', score: 0},
+    color: colorMatch ? {value: colorMatch[1], score: conf * 0.85} : {value: '', score: 0},
+  };
+
+  if (tier === 'plus' || tier === 'enterprise') {
+    attrs.country_of_origin = {value: guessOrigin(brand), score: guessOrigin(brand) ? confLow : 0};
+    attrs.halal = {value: cat.includes('food'), score: confLow};
+    attrs.gluten_free = {value: !raw.toLowerCase().includes('wheat'), score: confLow * 0.8};
+    attrs.organic = {value: raw.toLowerCase().includes('organic'), score: raw.toLowerCase().includes('organic') ? conf : confLow * 0.5};
+  }
+  if (tier === 'enterprise') {
+    attrs.product_type = {value: mapProductType(cat), score: conf};
+    attrs.scent = {value: cat.includes('non_food') ? (flavorMatch || '') : '', score: cat.includes('non_food') ? confLow : 0};
+    attrs.type_of_pack = packMatch ? {value: 'Multi-pack', score: conf} : {value: 'Single', score: confLow};
+  }
+
+  return attrs;
+}
+
+function extractGenericName(title, brand) {
+  let t = title.toLowerCase().replace(brand.toLowerCase(), '').trim();
+  t = t.replace(/\d+(?:\.\d+)?\s*(ml|l|g|kg|mg|tablets?|capsules?|m|pcs?)\b/gi, '');
+  t = t.replace(/\b(full fat|low fat|original|sugar free|zero|lemon|mint|coconut|chocolate|nacho cheese|cool mint|cocoa butter|lavender|6 pack|24|whole|1kg)\b/gi, '');
+  t = t.replace(/\b(can|pack|x)\b/gi, '');
+  t = t.replace(/\s+/g, ' ').trim();
+  const words = t.split(' ').filter(w => w.length > 1).slice(0, 3);
+  return words.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') || 'Product';
+}
+
+function guessOrigin(brand) {
+  const origins = {'Almarai':'Saudi Arabia','Nadec':'Saudi Arabia','Samsung':'South Korea','Apple':'USA','Coca-Cola':'USA','Pepsi':'USA','Nestlé':'Switzerland','Nido':'Switzerland','Colgate':'USA','Dettol':'UK','Fairy':'UK','Ariel':'USA','Persil':'Germany','Nivea':'Germany','Tide':'USA','Galaxy':'UK','KitKat':'Switzerland','Panadol':'UK','Aquafina':'USA',"Lay's":'USA','Doritos':'USA','Red Bull':'Austria'};
+  return origins[brand] || '';
+}
+
+function mapProductType(cat) {
+  const map = {packaged_food_beverages:'Packaged Food & Beverages',packaged_non_food:'Packaged Non-Food',ultrafresh_loose_food_beverages:'UltraFresh',electronics:'Electronics',pharmaceuticals:'Pharmaceuticals',smoking_tobacco:'Smoking & Tobacco',general_merchandise:'General Merchandise'};
+  return map[cat] || 'General Merchandise';
+}
+
+function runQA(title, attrs, tier, p) {
+  const checks = [];
+  const minLen = 10; const maxLen = 120;
+
+  checks.push({
+    name: 'Title length',
+    pass: title.length >= minLen && title.length <= maxLen,
+    detail: `${title.length} chars (${minLen}-${maxLen} required)`
+  });
+  checks.push({
+    name: 'Brand present in title',
+    pass: title.toLowerCase().includes((p.brand || '').toLowerCase()),
+    detail: p.brand ? `"${p.brand}" found` : 'No brand data'
+  });
+  checks.push({
+    name: 'No placeholder tokens',
+    pass: !/null|undefined|n\/a|tbd|test/i.test(title),
+    detail: 'Clean'
+  });
+  checks.push({
+    name: 'Size/unit present',
+    pass: attrs.item_size && attrs.item_size.score > 0,
+    detail: attrs.item_size?.value || 'Missing'
+  });
+
+  const reqScore = {lite:0.60,pro:0.70,plus:0.85,enterprise:0.90}[tier];
+  const avgScore = Object.values(attrs).filter(a => a.score > 0).reduce((s,a) => s + a.score, 0) / Math.max(Object.values(attrs).filter(a => a.score > 0).length, 1);
+  checks.push({
+    name: `Avg confidence >= ${(reqScore*100).toFixed(0)}%`,
+    pass: avgScore >= reqScore,
+    detail: `${(avgScore*100).toFixed(1)}%`
+  });
+
+  if (tier === 'plus' || tier === 'enterprise') {
+    checks.push({
+      name: 'Category-specific guidelines applied',
+      pass: true,
+      detail: 'Granular guidelines active'
+    });
+  }
+
+  const passed = checks.every(c => c.pass);
+  const route = passed ? 'auto-publish' : (checks.filter(c=>!c.pass).length <= 1 ? 'review' : 'rejected');
+
+  return { checks, passed, route, score: avgScore };
+}
+
+function computeQuality(attrs, title, tier) {
+  const attrScore = Object.values(attrs).filter(a => a.score > 0).reduce((s,a) => s + a.score, 0) / Math.max(Object.values(attrs).filter(a => a.score > 0).length, 1);
+  const titleBonus = title.length > 15 ? 0.05 : 0;
+  const tierBonus = {lite:0,pro:0.03,plus:0.06,enterprise:0.08}[tier];
+  return Math.min(attrScore + titleBonus + tierBonus, 0.99);
+}
+
+// ===== UI =====
+function showPreview() {
+  document.getElementById('uploadPreview').style.display = 'block';
+  document.getElementById('prevCount').textContent = products.length;
+  const tiers = [...new Set(products.map(p => p.vendor_tier))];
+  const regions = [...new Set(products.map(p => p.region))];
+  document.getElementById('prevTiers').textContent = tiers.length;
+  document.getElementById('prevRegions').textContent = regions.length;
+
+  // Tier chart
+  const tierCounts = {};
+  TIER_ORDER.forEach(t => tierCounts[t] = 0);
+  products.forEach(p => { const t = (p.vendor_tier||'lite').toLowerCase(); tierCounts[t] = (tierCounts[t]||0) + 1; });
+  renderBarChart('tierChart', TIER_ORDER.map(t => ({
+    label: TIER_LABELS[t], value: tierCounts[t] || 0, color: TIER_COLORS[t]
+  })));
+
+  // Category chart
+  const catCounts = {};
+  products.forEach(p => { const c = p.category || 'unknown'; catCounts[c] = (catCounts[c]||0)+1; });
+  const catEntries = Object.entries(catCounts).sort((a,b) => b[1]-a[1]);
+  renderBarChart('catChart', catEntries.map(([c,v]) => ({
+    label: CAT_LABELS[c] || c.slice(0,12), value: v, color: 'var(--blue)'
+  })));
+
+  // Preview table
+  const thead = document.querySelector('#previewTable thead tr');
+  const tbody = document.querySelector('#previewTable tbody');
+  const cols = ['master_product_code','product_title','brand','vendor_tier','region','category'];
+  thead.innerHTML = cols.map(c => `<th>${c}</th>`).join('');
+  tbody.innerHTML = products.slice(0, 10).map(p =>
+    `<tr>${cols.map(c => `<td>${p[c]||''}</td>`).join('')}</tr>`
+  ).join('') + (products.length > 10 ? `<tr><td colspan="${cols.length}" class="text-muted text-center">... and ${products.length-10} more</td></tr>` : '');
+}
+
+function renderBarChart(id, data) {
+  const max = Math.max(...data.map(d => d.value), 1);
+  document.getElementById(id).innerHTML = data.map(d => `
+    <div class="bar-col">
+      <div class="bar-value">${d.value}</div>
+      <div class="bar" style="height:${(d.value/max)*120}px;width:100%;background:${d.color};"></div>
+      <div class="bar-label">${d.label}</div>
+    </div>
+  `).join('');
+}
+
+// ===== WIZARD NAV =====
+function goToStep(n) {
+  currentStep = n;
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+
+  document.querySelectorAll('.wiz-step').forEach(s => {
+    const sn = parseInt(s.dataset.step);
+    s.classList.remove('active','done');
+    if (sn === n) s.classList.add('active');
+    else if (sn < n) s.classList.add('done');
+  });
+
+  if (n === 2) renderStep2();
+  if (n === 3) renderStep3();
+  if (n === 4) renderStep4();
+  if (n === 5) renderStep5();
+  if (n === 6) renderStep6();
+
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// ===== STEP 2: TIER =====
+function renderStep2() {
+  const tierCounts = {};
+  TIER_ORDER.forEach(t => tierCounts[t] = {count:0, promoted:0, downgraded:0, cost:0});
+  const roiSummary = {promoted:0, downgraded:0, noChange:0};
+  processed.forEach(p => {
+    tierCounts[p.finalTier].count++;
+    tierCounts[p.finalTier].cost += p.cost;
+    if (p.roi.direction === 'promoted') { tierCounts[p.originalTier].promoted++; roiSummary.promoted++; }
+    else if (p.roi.direction === 'downgraded') { tierCounts[p.originalTier].downgraded++; roiSummary.downgraded++; }
+    else { roiSummary.noChange++; }
+  });
+
+  document.getElementById('tierSummaryCards').innerHTML = TIER_ORDER.map(t => {
+    const d = tierCounts[t];
+    const movedIn = processed.filter(p => p.finalTier === t && p.originalTier !== t).length;
+    const movedOut = processed.filter(p => p.originalTier === t && p.finalTier !== t).length;
+    const moveNote = (movedIn || movedOut) ? `<div class="text-xs mt-05">${movedIn ? `<span class="text-green">+${movedIn} in</span> ` : ''}${movedOut ? `<span class="text-red">-${movedOut} out</span>` : ''}</div>` : '';
+    return `<div class="metric" style="border-top:3px solid ${TIER_COLORS[t]};">
+      <div class="val" style="color:${TIER_COLORS[t]};">${d.count}</div>
+      <div class="lbl">${TIER_LABELS[t]} Products</div>
+      <div class="delta text-muted">Est. $${d.cost.toFixed(2)}</div>
+      ${moveNote}
+    </div>`;
+  }).join('');
+
+  const tbody = document.getElementById('tierTableBody');
+  tbody.innerHTML = processed.map(p => {
+    const roiBadge = p.roi.signal === 'High' ? 'b-green' : p.roi.signal === 'Low' ? 'b-red' : 'b-amber';
+    const overrideText = p.roi.direction === 'promoted'
+      ? `<span class="badge b-green">&#8593; Promoted to ${TIER_LABELS[p.finalTier]}</span>`
+      : p.roi.direction === 'downgraded'
+      ? `<span class="badge b-red">&#8595; Downgraded to ${TIER_LABELS[p.finalTier]}</span>`
+      : `<span class="text-xs text-muted">No override</span>`;
+    return `<tr class="clickable" onclick="showProductModal('${p.master_product_code}')">
+      <td>${truncate(p.product_title, 35)}</td>
+      <td>${p.brand}</td>
+      <td class="text-xs">${p.vendor_name}</td>
+      <td><span class="badge b-${p.originalTier === 'enterprise' ? 'red' : p.originalTier === 'plus' ? 'purple' : p.originalTier === 'pro' ? 'blue' : 'gray'}">${TIER_LABELS[p.originalTier]}</span></td>
+      <td><span class="badge ${roiBadge}">${p.roi.signal}</span></td>
+      <td>${overrideText}</td>
+      <td><span class="badge b-${p.finalTier === 'enterprise' ? 'red' : p.finalTier === 'plus' ? 'purple' : p.finalTier === 'pro' ? 'blue' : 'gray'}">${TIER_LABELS[p.finalTier]}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== STEP 3: MODEL SELECTION =====
+function renderStep3() {
+  const tasks = Object.keys(MODEL_ASSIGN);
+  const matrixBody = document.getElementById('modelMatrixBody');
+  matrixBody.innerHTML = tasks.map(task => {
+    return `<tr>
+      <td><strong>${task}</strong></td>
+      ${TIER_ORDER.map(tier => {
+        const model = MODEL_ASSIGN[task][tier];
+        if (!model) return `<td style="text-align:center;" class="text-muted text-xs">-</td>`;
+        const m = MODEL_DB[model];
+        return `<td style="text-align:center;cursor:pointer;" onclick="showReason('${task}','${tier}')" class="clickable">
+          <div class="text-xs" style="color:${m.color};font-weight:600;">${model}</div>
+          <div class="text-xs text-muted">$${m.cost} / ${m.quality}%</div>
+        </td>`;
+      }).join('')}
+    </tr>`;
+  }).join('');
+
+  // Cost breakdown
+  const costBody = document.getElementById('costTableBody');
+  const tierGroups = {};
+  TIER_ORDER.forEach(t => tierGroups[t] = []);
+  processed.forEach(p => tierGroups[p.finalTier].push(p));
+
+  let total = 0;
+  costBody.innerHTML = TIER_ORDER.map(t => {
+    const prods = tierGroups[t];
+    const tierCost = prods.reduce((s,p) => s + p.cost, 0);
+    total += tierCost;
+    return `<tr>
+      <td><span class="badge b-${t === 'enterprise' ? 'red' : t === 'plus' ? 'purple' : t === 'pro' ? 'blue' : 'gray'}">${TIER_LABELS[t]}</span></td>
+      <td>${prods.length}</td>
+      <td>$${TIER_COSTS[t].toFixed(3)}</td>
+      <td class="text-green">$${tierCost.toFixed(3)}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('totalCost').textContent = '$' + total.toFixed(2);
+  const uniformCost = processed.length * 0.030;
+  const saved = uniformCost - total;
+  document.getElementById('costSavings').textContent = `$${saved.toFixed(2)} saved vs. uniform spend ($${uniformCost.toFixed(2)})`;
+}
+
+function showReason(task, tier) {
+  const box = document.getElementById('reasonBox');
+  box.innerHTML = MODEL_REASONS[task]?.[tier] || '<p class="text-muted">No reasoning available.</p>';
+}
+
+// ===== STEP 4: CONTENT GEN =====
+function renderStep4(filter) {
+  filter = filter || 'all';
+  const items = filter === 'all' ? processed : processed.filter(p => p.finalTier === filter);
+
+  document.getElementById('genTableBody').innerHTML = items.map(p => {
+    const model = p.titleModel;
+    const mInfo = MODEL_DB[model] || {};
+    const filledCount = Object.values(p.attributes).filter(a => a.score > 0.3).length;
+    const totalCount = Object.keys(p.attributes).length;
+
+    return `<tr class="clickable" onclick="showProductModal('${p.master_product_code}')">
+      <td class="font-mono text-muted">${truncate(p.product_title, 40)}</td>
+      <td class="font-mono text-green">${truncate(p.generatedTitle, 45)}</td>
+      <td><span class="badge b-${p.finalTier === 'enterprise' ? 'red' : p.finalTier === 'plus' ? 'purple' : p.finalTier === 'pro' ? 'blue' : 'gray'}">${TIER_LABELS[p.finalTier]}</span></td>
+      <td class="text-xs" style="color:${mInfo.color || 'inherit'};">${model}</td>
+      <td class="text-xs">${filledCount}/${totalCount}</td>
+      <td><span style="color:${p.quality >= 0.85 ? 'var(--green)' : p.quality >= 0.7 ? 'var(--amber)' : 'var(--dh-red)'};">${(p.quality*100).toFixed(0)}%</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterGen(tier) {
+  renderStep4(tier);
+  document.querySelectorAll('#step4 .btn-sm').forEach(b => b.className = 'btn btn-sm btn-secondary');
+  event.target.className = 'btn btn-sm btn-primary';
+}
+
+// ===== STEP 5: QA =====
+function renderStep5() {
+  let pass = 0, flagged = 0, rejected = 0;
+  processed.forEach(p => {
+    if (p.qa.route === 'auto-publish') pass++;
+    else if (p.qa.route === 'review') flagged++;
+    else rejected++;
+  });
+
+  document.getElementById('qaPassRate').textContent = ((pass/processed.length)*100).toFixed(0) + '%';
+  document.getElementById('qaAutoPublish').textContent = pass;
+  document.getElementById('qaFlagged').textContent = flagged;
+  document.getElementById('qaRejected').textContent = rejected;
+
+  const container = document.getElementById('qaResults');
+  container.innerHTML = processed.map(p => {
+    const isPass = p.qa.route === 'auto-publish';
+    const cls = isPass ? 'qa-pass' : 'qa-fail';
+    const icon = isPass ? '<span class="dot dot-green"></span>' : '<span class="dot dot-' + (p.qa.route === 'review' ? 'amber' : 'red') + '"></span>';
+    const routeBadge = p.qa.route === 'auto-publish'
+      ? '<span class="badge b-green">Auto-publish</span>'
+      : p.qa.route === 'review'
+      ? '<span class="badge b-amber">Flagged for review</span>'
+      : '<span class="badge b-red">Rejected</span>';
+
+    return `<div class="${cls} clickable" onclick="showProductModal('${p.master_product_code}')">
+      <div class="flex items-center justify-between mb-05">
+        <div class="flex items-center gap-05">
+          ${icon}
+          <strong class="text-sm">${truncate(p.generatedTitle, 50)}</strong>
+          <span class="badge b-${p.finalTier === 'enterprise' ? 'red' : p.finalTier === 'plus' ? 'purple' : p.finalTier === 'pro' ? 'blue' : 'gray'}">${TIER_LABELS[p.finalTier]}</span>
+        </div>
+        ${routeBadge}
+      </div>
+      <div class="flex gap-05 wrap">
+        ${p.qa.checks.map(c => `<span class="text-xs" style="color:${c.pass ? 'var(--green)' : 'var(--dh-red)'};">${c.pass ? '&#10003;' : '&#10005;'} ${c.name}: ${c.detail}</span>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== STEP 6: RESULTS =====
+function renderStep6() {
+  document.getElementById('rTotal').textContent = processed.length;
+  const avgQ = processed.reduce((s,p) => s + p.quality, 0) / processed.length;
+  document.getElementById('rQuality').textContent = (avgQ*100).toFixed(1) + '%';
+  const totalC = processed.reduce((s,p) => s + p.cost, 0);
+  document.getElementById('rCost').textContent = '$' + totalC.toFixed(2);
+  const avgT = processed.reduce((s,p) => s + p.time, 0) / processed.length;
+  document.getElementById('rTime').textContent = avgT.toFixed(1) + 's';
+
+  // Quality by tier
+  const qByTier = {};
+  TIER_ORDER.forEach(t => qByTier[t] = []);
+  processed.forEach(p => qByTier[p.finalTier].push(p.quality));
+  renderBarChart('qualityByTier', TIER_ORDER.map(t => ({
+    label: TIER_LABELS[t],
+    value: qByTier[t].length ? Math.round((qByTier[t].reduce((a,b)=>a+b,0)/qByTier[t].length)*100) : 0,
+    color: TIER_COLORS[t]
+  })));
+
+  // Cost by tier
+  const cByTier = {};
+  TIER_ORDER.forEach(t => cByTier[t] = 0);
+  processed.forEach(p => cByTier[p.finalTier] += p.cost);
+  renderBarChart('costByTier', TIER_ORDER.map(t => ({
+    label: TIER_LABELS[t],
+    value: Math.round(cByTier[t] * 1000),
+    color: TIER_COLORS[t]
+  })).map(d => ({...d, value: d.value, label: d.label})));
+
+  // Variant groups
+  const groups = {};
+  processed.forEach(p => {
+    const key = `${p.brand}|${p.attributes.generic_name?.value || 'unknown'}`;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(p);
+  });
+  const multiGroups = Object.entries(groups).filter(([,v]) => v.length > 1);
+
+  document.getElementById('variantGroups').innerHTML = multiGroups.length === 0
+    ? '<p class="text-sm text-muted">No variant groups detected in this dataset.</p>'
+    : multiGroups.map(([key, prods]) => {
+      const [brand, generic] = key.split('|');
+      return `<div class="card card-sm">
+        <div class="flex items-center justify-between mb-05">
+          <h3 style="margin:0;">${brand} ${generic}</h3>
+          <span class="badge b-purple">${prods.length} variants</span>
+        </div>
+        <div class="flex gap-05 wrap">
+          ${prods.map(p => `<span class="attr attr-new">${truncate(p.generatedTitle,40)} (${p.attributes.item_size?.value || '?'})</span>`).join('')}
+        </div>
+      </div>`;
+    }).join('');
+
+  // Report table
+  document.getElementById('reportTableBody').innerHTML = processed.map(p => {
+    const qColor = p.quality >= 0.85 ? 'var(--green)' : p.quality >= 0.7 ? 'var(--amber)' : 'var(--dh-red)';
+    const routeBadge = p.qa.route === 'auto-publish' ? 'b-green' : p.qa.route === 'review' ? 'b-amber' : 'b-red';
+    return `<tr class="clickable" onclick="showProductModal('${p.master_product_code}')">
+      <td>${truncate(p.generatedTitle, 35)}</td>
+      <td><span class="badge b-${p.finalTier === 'enterprise' ? 'red' : p.finalTier === 'plus' ? 'purple' : p.finalTier === 'pro' ? 'blue' : 'gray'}">${TIER_LABELS[p.finalTier]}</span></td>
+      <td class="text-xs">${p.titleModel}</td>
+      <td style="color:${qColor};">${(p.quality*100).toFixed(0)}%</td>
+      <td><span class="badge ${routeBadge}">${p.qa.route === 'auto-publish' ? 'Pass' : p.qa.route === 'review' ? 'Review' : 'Fail'}</span></td>
+      <td>$${p.cost.toFixed(3)}</td>
+      <td><span class="badge ${routeBadge}">${p.qa.route}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== MODAL =====
+function showProductModal(code) {
+  const p = processed.find(x => x.master_product_code === code);
+  if (!p) return;
+
+  const tierBadge = `b-${p.finalTier === 'enterprise' ? 'red' : p.finalTier === 'plus' ? 'purple' : p.finalTier === 'pro' ? 'blue' : 'gray'}`;
+  const model = p.titleModel;
+  const mInfo = MODEL_DB[model] || {};
+
+  let html = `
+    <div class="flex items-center gap-05 mb-1">
+      <span class="badge ${tierBadge}">${TIER_LABELS[p.finalTier]}</span>
+      <span class="text-xs text-muted">${p.master_product_code}</span>
+      <span class="text-xs text-muted">${p.region?.toUpperCase() || ''}</span>
+    </div>
+    <h2 style="margin-bottom:0.25rem;">${p.generatedTitle}</h2>
+    <p class="text-xs text-muted mb-2">${p.vendor_name}</p>
+
+    <div class="g2 gap-1 mb-2">
+      <div>
+        <h3 class="mb-05">Title Transformation</h3>
+        <div class="card card-sm mb-05" style="border-left:3px solid var(--dh-red);">
+          <div class="text-xs text-muted">Raw Input</div>
+          <div class="font-mono">${p.product_title}</div>
+        </div>
+        <div class="card card-sm" style="border-left:3px solid var(--green);">
+          <div class="text-xs text-muted">Generated Output</div>
+          <div class="font-mono text-green">${p.generatedTitle}</div>
+        </div>
+      </div>
+      <div>
+        <h3 class="mb-05">Model & Cost</h3>
+        <div class="card card-sm">
+          <div class="flex items-center gap-05 mb-05">
+            <strong style="color:${mInfo.color || 'inherit'};">${model}</strong>
+            <span class="badge b-${mInfo.type === 'Fine-tuned' ? 'purple' : 'blue'}">${mInfo.type}</span>
+          </div>
+          <div class="text-xs text-muted">Quality: ${mInfo.quality}% | Latency: ${mInfo.latency}ms | Cost: $${mInfo.cost}/product</div>
+          <div class="reason-box mt-05" style="font-size:0.75rem;">
+            ${MODEL_REASONS['Title Generation']?.[p.finalTier] || ''}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="mb-05">ROI Assessment</h3>
+    <div class="card card-sm mb-2">
+      <div class="flex items-center gap-05">
+        <span class="badge ${p.roi.signal === 'High' ? 'b-green' : p.roi.signal === 'Low' ? 'b-red' : 'b-amber'}">${p.roi.signal} ROI</span>
+        ${p.roi.direction === 'promoted' ? `<span class="badge b-green">Promoted: ${TIER_LABELS[p.originalTier]} &#8594; ${TIER_LABELS[p.finalTier]}</span>` : ''}
+        ${p.roi.direction === 'downgraded' ? `<span class="badge b-red">Downgraded: ${TIER_LABELS[p.originalTier]} &#8594; ${TIER_LABELS[p.finalTier]}</span>` : ''}
+      </div>
+      <p class="text-xs text-muted mt-05">${p.roi.reason}</p>
+    </div>
+
+    <h3 class="mb-05">Extracted Attributes</h3>
+    <div class="tbl-wrap mb-2">
+      <table class="tbl">
+        <thead><tr><th>Attribute</th><th>Value</th><th>Confidence</th></tr></thead>
+        <tbody>
+          ${Object.entries(p.attributes).map(([k,v]) => {
+            const confColor = v.score >= 0.8 ? 'var(--green)' : v.score >= 0.5 ? 'var(--amber)' : 'var(--dh-red)';
+            const valDisplay = v.value === '' || v.value === false ? '<span class="text-muted">-</span>' : (typeof v.value === 'boolean' ? (v.value ? 'Yes' : 'No') : v.value);
+            return `<tr>
+              <td>${k.replace(/_/g, ' ')}</td>
+              <td>${valDisplay}</td>
+              <td>
+                <div class="prog" style="width:60px;display:inline-block;">
+                  <div class="fill" style="width:${v.score*100}%;background:${confColor};"></div>
+                </div>
+                <span class="text-xs" style="color:${confColor};margin-left:4px;">${v.score > 0 ? (v.score*100).toFixed(0)+'%' : '-'}</span>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="mb-05">QA Gate Result</h3>
+    <div class="${p.qa.passed ? 'qa-pass' : 'qa-fail'} mb-1">
+      <div class="flex items-center gap-05 mb-05">
+        <span class="dot dot-${p.qa.passed ? 'green' : p.qa.route === 'review' ? 'amber' : 'red'}"></span>
+        <strong>${p.qa.route === 'auto-publish' ? 'Passed - Auto-publish' : p.qa.route === 'review' ? 'Flagged for Review' : 'Rejected'}</strong>
+      </div>
+      ${p.qa.checks.map(c => `<div class="text-xs" style="color:${c.pass ? 'var(--green)' : 'var(--dh-red)'};">${c.pass ? '&#10003;' : '&#10005;'} ${c.name}: ${c.detail}</div>`).join('')}
+    </div>
+
+    <div class="g3 gap-1">
+      <div class="metric"><div class="val" style="color:${p.quality >= 0.85 ? 'var(--green)' : 'var(--amber)'};">${(p.quality*100).toFixed(0)}%</div><div class="lbl">Quality Score</div></div>
+      <div class="metric"><div class="val text-cyan">$${p.cost.toFixed(3)}</div><div class="lbl">Cost</div></div>
+      <div class="metric"><div class="val text-purple">${p.time.toFixed(1)}s</div><div class="lbl">Processing Time</div></div>
+    </div>
+  `;
+
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ===== UTIL =====
+function truncate(s, n) {
+  return (s||'').length > n ? s.slice(0, n) + '...' : (s||'');
+}
+</script>
+
+</body>
+</html>
