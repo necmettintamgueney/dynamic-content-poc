@@ -2,7 +2,12 @@
 
 Interactive demo for the Dynamic Content Strategy vision. Built to articulate the end-to-end content enrichment pipeline to leadership and engineering teams.
 
-## How to Run
+## Live Demo
+
+- [Strategy Overview](https://necmettintamgueney.github.io/dynamic-content-poc/index.html)
+- [Interactive Pipeline Wizard](https://necmettintamgueney.github.io/dynamic-content-poc/demo.html)
+
+## How to Run Locally
 
 Both pages are standalone HTML files with no dependencies, no build step, and no server required.
 
