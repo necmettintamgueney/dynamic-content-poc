@@ -289,7 +289,8 @@ input[type="file"]{display:none;}
   <div class="wiz-step" data-step="3"><div class="wiz-num">3</div><div class="wiz-label">Model Selection</div></div><div class="wiz-connector"></div>
   <div class="wiz-step" data-step="4"><div class="wiz-num">4</div><div class="wiz-label">Content Gen</div></div><div class="wiz-connector"></div>
   <div class="wiz-step" data-step="5"><div class="wiz-num">5</div><div class="wiz-label">QA Gate</div></div><div class="wiz-connector"></div>
-  <div class="wiz-step" data-step="6"><div class="wiz-num">6</div><div class="wiz-label">Results</div></div>
+  <div class="wiz-step" data-step="6"><div class="wiz-num">6</div><div class="wiz-label">Results</div></div><div class="wiz-connector"></div>
+  <div class="wiz-step" data-step="7"><div class="wiz-num">7</div><div class="wiz-label">New Attribute</div></div>
 </div>
 
 <div class="main" style="display:none;">
@@ -533,6 +534,74 @@ input[type="file"]{display:none;}
 
   <div class="nav-btns">
     <button class="btn btn-secondary" onclick="goToStep(5)">&#8592; Back</button>
+    <button class="btn btn-primary" onclick="goToStep(7)">New Attribute Onboarding &#8594;</button>
+  </div>
+</div>
+
+<div class="step-panel" id="step7">
+  <h1>New Attribute Onboarding</h1>
+  <p class="subtitle">Cold-start a new attribute from scratch. Define it, seed a few examples, and watch the system bootstrap predictions, estimate accuracy, and plan a path to production.</p>
+
+  <h2 class="mb-1">Select an Attribute to Onboard</h2>
+  <div class="g4 mb-2" id="attrPresetCards"></div>
+
+  <div id="attrOnboardingContent" style="display:none;">
+    <div id="attrDefinition" class="mb-2"></div>
+
+    <h2 class="mb-1">Seed Examples (Few-Shot Training Data)</h2>
+    <p class="text-xs text-muted mb-1">These annotated examples become the LLM's few-shot prompt. No training dataset needed — the model learns from these examples at inference time.</p>
+    <div class="tbl-wrap mb-2">
+      <table class="tbl" id="seedExamplesTable">
+        <thead><tr><th style="width:36px;"></th><th>Product</th><th>Brand</th><th>Annotated Value</th><th>Source</th></tr></thead>
+        <tbody id="seedExamplesBody"></tbody>
+      </table>
+    </div>
+
+    <h2 class="mb-1">Bootstrap Assessment</h2>
+    <p class="text-xs text-muted mb-1">How well can the model predict this attribute with only the seed examples above?</p>
+
+    <div class="g4 mb-2" id="attrMetrics"></div>
+
+    <h3 class="mb-05">Learning Curve</h3>
+    <p class="text-xs text-muted mb-1">Estimated accuracy as more examples are annotated. The system improves with each correction from the QA loop.</p>
+    <div class="card mb-2" id="learningCurvePanel"></div>
+
+    <div class="g2 gap-1 mb-2">
+      <div>
+        <h3 class="mb-05">Prediction Preview</h3>
+        <p class="text-xs text-muted mb-05">Model predictions on unseen products using only the seed examples.</p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th style="width:36px;"></th><th>Product</th><th>Prediction</th><th>Confidence</th><th>Status</th></tr></thead>
+            <tbody id="predictionPreviewBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <h3 class="mb-05">Active Learning — Next Annotations</h3>
+        <p class="text-xs text-muted mb-05">Annotate these products next for maximum accuracy gain.</p>
+        <div id="activeLearningPanel" class="flex flex-col gap-05"></div>
+      </div>
+    </div>
+
+    <div class="g2 gap-1 mb-2">
+      <div>
+        <h3 class="mb-05">QA Gate Configuration</h3>
+        <div id="qaGateConfig" class="card"></div>
+      </div>
+      <div>
+        <h3 class="mb-05">Improvement Plan</h3>
+        <div id="improvementPlan" class="card"></div>
+      </div>
+    </div>
+
+    <h3 class="mb-05">Tier Rollout Roadmap</h3>
+    <p class="text-xs text-muted mb-1">Graduated rollout: start at Enterprise with full review, expand as accuracy grows.</p>
+    <div id="rolloutTimeline" class="mb-2"></div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="goToStep(6)">&#8592; Back</button>
     <a href="index.html" class="btn btn-primary" style="text-decoration:none;">View Full Strategy &#8594;</a>
   </div>
 </div>
@@ -727,6 +796,77 @@ const TIER_CAPABILITIES = {
   pro: ['Typo correction','Case normalization','Brand positioning','Size normalization','Abbreviation expansion','Basic image analysis','Basic variant grouping'],
   plus: ['Typo correction','Case normalization','Brand positioning','Size normalization','Abbreviation expansion','Product type inference','Title restructuring','Guideline compliance','Image OCR','Advanced variant grouping'],
   enterprise: ['Typo correction','Case normalization','Brand positioning','Size normalization','Abbreviation expansion','Product type inference','Title restructuring','Guideline compliance','Full multimodal analysis','Cross-language variant matching','Partner-grade quality verification','All attributes extracted'],
+};
+
+const ATTRIBUTE_PRESETS = {
+  calories: {
+    name: 'Calories per Serving',
+    description: 'Energy content per standard serving in kcal. Extracted from nutrition labels on packaging via image OCR, or inferred from product type and size when label is not readable.',
+    dataType: 'numeric', range: [0, 2000], unit: 'kcal',
+    categories: ['packaged_food_beverages'],
+    catLabel: 'Food & Beverages',
+    isVariant: false,
+    sources: ['Packaging label', 'Image OCR', 'LLM inference from product type'],
+    tierAvailability: {lite:false, pro:'Title keywords only', plus:'Title + Image OCR', enterprise:'Full multimodal + cross-reference'},
+    learningCurve: {5:62, 10:71, 20:81, 50:89, 100:93},
+    currentExamples: 5,
+    coverage: 78, avgConfidence: 64, accuracy: 62, projectedAccuracy: 93,
+    color: 'var(--green)',
+    seedValues: {'Almarai':150,'Coca-Cola':139,'Pepsi':150,'KitKat':213,"Lay's":160,'Red Bull':112,'Doritos':140,'Sprite':140,'Fanta':160,'Nescafe':5,'Lipton':2,'Nutella':200,'Cadbury':240,'Galaxy':230,'Lindt':210,'Toblerone':260,'Pringles':150,'Kinder':122,'Maggi':190,'Indomie':380,'Vimto':100,'Tang':90,'Rani':120},
+    predValues: {'Aquafina':0,'Al Ain':0,'Evian':0,'Nido':155,'Nadec':148,'Philadelphia':80,'Puck':90,'Lurpak':100,'Domty':85},
+    validationRule: 'Range: 0-2000 kcal per serving',
+  },
+  skinType: {
+    name: 'Skin Type',
+    description: 'Target skin type for skincare and personal care products. Determines which consumer segment the product serves. Extracted from product title, packaging claims, or inferred from product line.',
+    dataType: 'enum', allowedValues: ['Normal','Dry','Oily','Sensitive','Combination','All Skin Types'],
+    categories: ['packaged_non_food'],
+    catLabel: 'Non-Food (H&B)',
+    isVariant: true,
+    sources: ['Title keywords', 'Product line mapping', 'Image OCR (packaging claims)'],
+    tierAvailability: {lite:false, pro:'Title keywords only', plus:'Title + product line mapping', enterprise:'Full multimodal + brand database'},
+    learningCurve: {5:58, 10:67, 20:78, 50:87, 100:92},
+    currentExamples: 5,
+    coverage: 65, avgConfidence: 58, accuracy: 58, projectedAccuracy: 92,
+    color: 'var(--purple)',
+    seedValues: {'Dove':'Normal','Nivea':'Dry','Head & Shoulders':'Normal','Dettol':'All Skin Types','Colgate':'N/A'},
+    predValues: {"L'Oreal":'Normal','Pampers':'Sensitive','Comfort':'N/A','Persil':'N/A','Fairy':'N/A'},
+    validationRule: 'Must be one of: Normal, Dry, Oily, Sensitive, Combination, All Skin Types',
+  },
+  sugarContent: {
+    name: 'Sugar Content',
+    description: 'Sugar classification for food and beverage products. Derived from title keywords (zero, sugar free, diet, light) or nutrition label OCR. Critical for health-conscious filtering and dietary compliance.',
+    dataType: 'enum', allowedValues: ['Regular','Zero / No Sugar','Low Sugar','Sugar Free','Diet'],
+    categories: ['packaged_food_beverages'],
+    catLabel: 'Food & Beverages',
+    isVariant: true,
+    sources: ['Title keywords', 'Image OCR (nutrition label)', 'LLM inference'],
+    tierAvailability: {lite:false, pro:'Title keywords only', plus:'Title + Image OCR', enterprise:'Full multimodal + nutrition label parsing'},
+    learningCurve: {5:72, 10:79, 20:86, 50:91, 100:95},
+    currentExamples: 5,
+    coverage: 85, avgConfidence: 72, accuracy: 72, projectedAccuracy: 95,
+    color: 'var(--cyan)',
+    seedValues: {'Coca-Cola':'Regular','Pepsi':'Regular','Red Bull':'Regular','Sprite':'Regular','Fanta':'Regular'},
+    predValues: {},
+    validationRule: 'Must be one of: Regular, Zero / No Sugar, Low Sugar, Sugar Free, Diet',
+  },
+  fragrance: {
+    name: 'Fragrance',
+    description: 'Scent or fragrance of personal care and home care products. Extracted from title keywords or packaging. Important for variant grouping (same product, different scents).',
+    dataType: 'freetext', maxLength: 50,
+    categories: ['packaged_non_food'],
+    catLabel: 'Non-Food',
+    isVariant: true,
+    sources: ['Title keywords', 'Image OCR (packaging text)', 'LLM inference from product line'],
+    tierAvailability: {lite:false, pro:'Title keywords only', plus:'Title + Image OCR', enterprise:'Full multimodal + brand catalog'},
+    learningCurve: {5:55, 10:65, 20:76, 50:85, 100:91},
+    currentExamples: 5,
+    coverage: 60, avgConfidence: 55, accuracy: 55, projectedAccuracy: 91,
+    color: 'var(--amber)',
+    seedValues: {'Fairy':'Lemon','Persil':'Lavender','Dove':'Original','Comfort':'Blue','Downy':'Blue','Dettol':'Pine'},
+    predValues: {'Ariel':'Original','Tide':'Original',"L'Oreal":'N/A','Colgate':'Cool Mint','Head & Shoulders':'Classic'},
+    validationRule: 'Free text, max 50 characters. Common: Lavender, Lemon, Original, Pine, Rose',
+  },
 };
 
 function fmtCost(perProduct) {
@@ -1766,6 +1906,7 @@ function goToStep(n) {
   if (n === 4) renderStep4();
   if (n === 5) renderStep5();
   if (n === 6) renderStep6();
+  if (n === 7) renderStep7();
 
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
@@ -2400,6 +2541,329 @@ function simulateTierTitle(p, tier) {
     return applyDairyGuidelines(p, tier).title;
   }
   return generateTitle(p, tier);
+}
+
+// ===== STEP 7: NEW ATTRIBUTE ONBOARDING =====
+let selectedAttrPreset = null;
+
+function renderStep7() {
+  const cards = document.getElementById('attrPresetCards');
+  cards.innerHTML = Object.entries(ATTRIBUTE_PRESETS).map(([key, a]) => {
+    const selected = selectedAttrPreset === key;
+    return `<div class="card clickable${selected ? ' selected' : ''}" style="cursor:pointer;border:2px solid ${selected ? a.color : 'var(--border)'};transition:all 0.2s;" onclick="selectAttributePreset('${key}')">
+      <div class="flex items-center gap-05 mb-05">
+        <strong style="color:${a.color};">${a.name}</strong>
+        <span class="badge b-${a.dataType === 'numeric' ? 'blue' : a.dataType === 'enum' ? 'purple' : 'amber'}">${a.dataType === 'freetext' ? 'Free Text' : a.dataType.charAt(0).toUpperCase() + a.dataType.slice(1)}</span>
+        ${a.isVariant ? '<span class="badge b-cyan">Variant</span>' : ''}
+      </div>
+      <p class="text-xs text-muted mb-05">${a.catLabel}</p>
+      <p class="text-xs">${a.description.slice(0, 80)}...</p>
+    </div>`;
+  }).join('');
+
+  if (selectedAttrPreset) {
+    selectAttributePreset(selectedAttrPreset);
+  }
+}
+
+function selectAttributePreset(key) {
+  selectedAttrPreset = key;
+  const a = ATTRIBUTE_PRESETS[key];
+  document.getElementById('attrOnboardingContent').style.display = 'block';
+
+  // Re-render preset cards with selection state
+  document.querySelectorAll('#attrPresetCards .card').forEach(c => {
+    c.style.borderColor = 'var(--border)';
+  });
+  const idx = Object.keys(ATTRIBUTE_PRESETS).indexOf(key);
+  const cards = document.querySelectorAll('#attrPresetCards .card');
+  if (cards[idx]) cards[idx].style.borderColor = a.color;
+
+  // Definition
+  const tierAvailHTML = TIER_ORDER.map(t => {
+    const avail = a.tierAvailability[t];
+    return `<div class="flex items-center gap-05" style="padding:0.3rem 0;">
+      <span class="badge b-${t === 'enterprise' ? 'red' : t === 'plus' ? 'purple' : t === 'pro' ? 'blue' : 'gray'}">${TIER_LABELS[t]}</span>
+      ${avail ? `<span class="text-xs text-green">${typeof avail === 'string' ? avail : 'Active'}</span>` : '<span class="text-xs text-muted" style="opacity:0.5;">Not extracted</span>'}
+    </div>`;
+  }).join('');
+
+  document.getElementById('attrDefinition').innerHTML = `
+    <div class="card" style="border-left:4px solid ${a.color};">
+      <div class="g2 gap-1">
+        <div>
+          <div class="flex items-center gap-05 mb-05">
+            <h2 style="margin:0;color:${a.color};">${a.name}</h2>
+            <span class="badge b-${a.dataType === 'numeric' ? 'blue' : a.dataType === 'enum' ? 'purple' : 'amber'}">${a.dataType === 'freetext' ? 'Free Text' : a.dataType.charAt(0).toUpperCase() + a.dataType.slice(1)}</span>
+            ${a.isVariant ? '<span class="badge b-cyan">Variant-defining</span>' : '<span class="badge b-gray">Non-variant</span>'}
+          </div>
+          <p class="text-xs mb-1">${a.description}</p>
+          <div class="mb-05">
+            <div class="text-xs text-muted" style="font-weight:600;">Applicable Categories</div>
+            <div class="flex gap-05 wrap">${a.categories.map(c => `<span class="badge b-blue">${CAT_LABELS[c] || c}</span>`).join('')}</div>
+          </div>
+          ${a.allowedValues ? `<div class="mb-05"><div class="text-xs text-muted" style="font-weight:600;">Allowed Values</div><div class="flex gap-05 wrap">${a.allowedValues.map(v => `<span class="attr">${v}</span>`).join('')}</div></div>` : ''}
+          ${a.range ? `<div class="mb-05"><div class="text-xs text-muted" style="font-weight:600;">Valid Range</div><div class="text-xs">${a.range[0]} – ${a.range[1]} ${a.unit || ''}</div></div>` : ''}
+          <div>
+            <div class="text-xs text-muted" style="font-weight:600;">Extraction Sources (priority order)</div>
+            <div class="text-xs">${a.sources.map((s,i) => `<span style="opacity:${1 - i*0.2};">${i+1}. ${s}</span>`).join(' → ')}</div>
+          </div>
+        </div>
+        <div>
+          <div class="text-xs text-muted mb-05" style="font-weight:600;">Tier Availability</div>
+          ${tierAvailHTML}
+        </div>
+      </div>
+    </div>`;
+
+  // Seed examples
+  const applicable = processed.filter(p => a.categories.includes(p.category || ''));
+  const seeds = [];
+  applicable.forEach(p => {
+    const val = a.seedValues[p.brand];
+    if (val !== undefined && seeds.length < 8) {
+      const src = a.dataType === 'numeric' ? 'Packaging' : (p.product_title.toLowerCase().includes(String(val).toLowerCase().split(' ')[0]) ? 'Title' : 'Inferred');
+      seeds.push({product: p, value: typeof val === 'number' ? val + ' ' + (a.unit || '') : val, source: src});
+    }
+  });
+  // Deduplicate by brand
+  const seenBrands = new Set();
+  const uniqueSeeds = seeds.filter(s => {
+    if (seenBrands.has(s.product.brand)) return false;
+    seenBrands.add(s.product.brand);
+    return true;
+  });
+
+  document.getElementById('seedExamplesBody').innerHTML = uniqueSeeds.map(s => `<tr>
+    <td>${imgThumb(s.product.image_url)}</td>
+    <td class="text-xs">${truncate(s.product.generatedTitle, 40)}</td>
+    <td class="text-xs">${s.product.brand}</td>
+    <td><strong style="color:${a.color};">${s.value}</strong></td>
+    <td><span class="badge b-gray">${s.source}</span></td>
+  </tr>`).join('');
+
+  // Metrics
+  const applicableCount = applicable.length;
+  const coveredCount = Math.round(applicableCount * a.coverage / 100);
+  document.getElementById('attrMetrics').innerHTML = `
+    <div class="metric"><div class="val" style="color:${a.coverage >= 80 ? 'var(--green)' : 'var(--amber)'};">${a.coverage}%</div><div class="lbl">Coverage</div><div class="delta text-muted">${coveredCount} of ${applicableCount} products</div></div>
+    <div class="metric"><div class="val" style="color:${a.avgConfidence >= 80 ? 'var(--green)' : a.avgConfidence >= 60 ? 'var(--amber)' : 'var(--dh-red)'};">${a.avgConfidence}%</div><div class="lbl">Avg Confidence</div><div class="delta text-muted">${a.avgConfidence >= 80 ? 'Above' : 'Below'} 80% threshold</div></div>
+    <div class="metric"><div class="val" style="color:${a.accuracy >= 85 ? 'var(--green)' : a.accuracy >= 70 ? 'var(--amber)' : 'var(--dh-red)'};">${a.accuracy}%</div><div class="lbl">Accuracy (${a.currentExamples} examples)</div><div class="delta text-muted">Cross-validated</div></div>
+    <div class="metric"><div class="val text-green">${a.projectedAccuracy}%</div><div class="lbl">Projected (100 examples)</div><div class="delta text-muted">Meets production threshold</div></div>`;
+
+  // Learning curve
+  renderLearningCurve(a);
+
+  // Prediction preview
+  renderPredictionPreview(a, applicable);
+
+  // Active learning
+  renderActiveLearning(a, applicable);
+
+  // QA gate config
+  renderQAGateConfig(a, applicableCount);
+
+  // Improvement plan
+  renderImprovementPlan(a);
+
+  // Rollout timeline
+  renderRolloutTimeline(a);
+
+  window.scrollTo({top: document.getElementById('attrDefinition').offsetTop - 80, behavior: 'smooth'});
+}
+
+function renderLearningCurve(a) {
+  const entries = Object.entries(a.learningCurve).map(([n, acc]) => ({n: parseInt(n), acc}));
+  const maxAcc = 100;
+  const prodThreshold = 93;
+
+  document.getElementById('learningCurvePanel').innerHTML = `
+    <div style="position:relative;">
+      <div style="position:absolute;left:${prodThreshold}%;top:0;bottom:0;border-left:2px dashed var(--green);opacity:0.4;z-index:1;"></div>
+      <div style="position:absolute;left:${prodThreshold}%;top:-2px;font-size:0.6rem;color:var(--green);transform:translateX(-50%);z-index:2;">Production: ${prodThreshold}%</div>
+      ${entries.map(({n, acc}) => {
+        const isCurrent = n === a.currentExamples;
+        const barColor = acc >= 85 ? 'var(--green)' : acc >= 70 ? 'var(--amber)' : 'var(--dh-red)';
+        return `<div class="flex items-center gap-05" style="margin-bottom:0.5rem;${isCurrent ? 'background:rgba(212,33,61,0.08);padding:0.4rem;border-radius:6px;margin:-0.2rem -0.4rem;' : ''}">
+          <div style="width:90px;text-align:right;font-size:0.75rem;${isCurrent ? 'font-weight:700;color:var(--dh-red);' : 'color:var(--muted);'}">${n} examples</div>
+          <div style="flex:1;height:22px;background:var(--darker);border-radius:4px;position:relative;overflow:hidden;">
+            <div style="width:${acc}%;height:100%;background:${barColor};border-radius:4px;transition:width 0.5s;"></div>
+          </div>
+          <div style="width:50px;font-size:0.8rem;font-weight:600;color:${barColor};">${acc}%</div>
+          ${isCurrent ? '<span class="badge b-red" style="font-size:0.6rem;">Current</span>' : ''}
+          ${acc >= prodThreshold && n !== a.currentExamples ? '<span class="text-xs text-green">&#10003;</span>' : ''}
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function renderPredictionPreview(a, applicable) {
+  const predictions = [];
+  applicable.forEach(p => {
+    const val = a.predValues[p.brand];
+    if (val !== undefined && predictions.length < 6) {
+      const conf = 0.35 + Math.abs(p.master_product_code.split('').reduce((h,c) => ((h<<3)-h+c.charCodeAt(0))|0, 0) % 50) / 100;
+      const displayVal = typeof val === 'number' ? val + ' ' + (a.unit || '') : val;
+      predictions.push({product: p, value: displayVal, confidence: conf});
+    }
+  });
+  // Also add some from seed values that weren't in the seed set
+  if (predictions.length < 6) {
+    applicable.filter(p => !a.seedValues[p.brand] && !a.predValues[p.brand]).slice(0, 6 - predictions.length).forEach(p => {
+      const conf = 0.25 + Math.abs(p.master_product_code.split('').reduce((h,c) => ((h<<3)-h+c.charCodeAt(0))|0, 0) % 35) / 100;
+      const guessVal = a.dataType === 'numeric' ? (Math.round(80 + conf * 200)) + ' ' + (a.unit || '') : (a.allowedValues ? a.allowedValues[Math.abs(p.master_product_code.charCodeAt(4)) % a.allowedValues.length] : 'Unknown');
+      predictions.push({product: p, value: guessVal, confidence: conf});
+    });
+  }
+
+  document.getElementById('predictionPreviewBody').innerHTML = predictions.map(pr => {
+    const confPct = (pr.confidence * 100).toFixed(0);
+    const confColor = pr.confidence >= 0.8 ? 'var(--green)' : pr.confidence >= 0.6 ? 'var(--amber)' : 'var(--dh-red)';
+    const statusBadge = pr.confidence >= 0.8 ? '<span class="badge b-green">High</span>' : pr.confidence >= 0.6 ? '<span class="badge b-amber">Medium</span>' : '<span class="badge b-red">Uncertain</span>';
+    return `<tr>
+      <td>${imgThumb(pr.product.image_url)}</td>
+      <td class="text-xs">${truncate(pr.product.generatedTitle, 30)}</td>
+      <td><strong style="color:${a.color};">${pr.value}</strong></td>
+      <td><div style="display:flex;align-items:center;gap:0.3rem;">
+        <div style="width:60px;height:6px;background:var(--darker);border-radius:3px;overflow:hidden;">
+          <div style="width:${confPct}%;height:100%;background:${confColor};border-radius:3px;"></div>
+        </div>
+        <span class="text-xs" style="color:${confColor};">${confPct}%</span>
+      </div></td>
+      <td>${statusBadge}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderActiveLearning(a, applicable) {
+  const uncertain = applicable
+    .filter(p => !a.seedValues[p.brand] && !a.predValues[p.brand])
+    .slice(0, 4)
+    .map((p, i) => {
+      const conf = 0.25 + (i * 0.08);
+      const impactPct = (4 - i) + 1;
+      let reason = '';
+      if (a.dataType === 'enum' && a.allowedValues) {
+        const v1 = a.allowedValues[i % a.allowedValues.length];
+        const v2 = a.allowedValues[(i + 1) % a.allowedValues.length];
+        reason = `Uncertain between "${v1}" and "${v2}"`;
+      } else if (a.dataType === 'numeric') {
+        reason = 'No similar product in seed set';
+      } else {
+        reason = 'Product category underrepresented in examples';
+      }
+      return {product: p, confidence: conf, reason, impact: impactPct};
+    });
+
+  document.getElementById('activeLearningPanel').innerHTML = uncertain.length === 0
+    ? '<p class="text-xs text-muted">All applicable products have seed examples.</p>'
+    : uncertain.map(u => `<div class="card card-sm" style="border-left:3px solid var(--amber);">
+      <div class="flex items-center gap-05 mb-05">
+        ${imgThumb(u.product.image_url, 24)}
+        <strong class="text-xs">${truncate(u.product.generatedTitle, 35)}</strong>
+        <span class="badge b-red" style="margin-left:auto;">${(u.confidence * 100).toFixed(0)}% conf</span>
+      </div>
+      <p class="text-xs text-muted">${u.reason}</p>
+      <p class="text-xs text-green">Annotating this could improve accuracy by ~${u.impact}%</p>
+    </div>`).join('');
+}
+
+function renderQAGateConfig(a, totalProducts) {
+  const autoAccept = Math.round(totalProducts * 0.30);
+  const review = Math.round(totalProducts * 0.45);
+  const reject = totalProducts - autoAccept - review;
+
+  document.getElementById('qaGateConfig').innerHTML = `
+    <div class="mb-1">
+      <div class="flex items-center gap-05 mb-05">
+        <span class="badge b-green">Auto-accept</span>
+        <span class="text-xs">&ge; 85% confidence</span>
+        <span class="text-xs text-muted" style="margin-left:auto;">${autoAccept} products</span>
+      </div>
+      <div class="flex items-center gap-05 mb-05">
+        <span class="badge b-amber">Human review</span>
+        <span class="text-xs">60-85% confidence</span>
+        <span class="text-xs text-muted" style="margin-left:auto;">${review} products</span>
+      </div>
+      <div class="flex items-center gap-05 mb-05">
+        <span class="badge b-red">Reject / annotate</span>
+        <span class="text-xs">&lt; 60% confidence</span>
+        <span class="text-xs text-muted" style="margin-left:auto;">${reject} products</span>
+      </div>
+    </div>
+    <div style="display:flex;height:20px;border-radius:4px;overflow:hidden;margin-bottom:0.75rem;">
+      <div style="width:${autoAccept/totalProducts*100}%;background:var(--green);"></div>
+      <div style="width:${review/totalProducts*100}%;background:var(--amber);"></div>
+      <div style="width:${reject/totalProducts*100}%;background:var(--dh-red);"></div>
+    </div>
+    <div class="text-xs text-muted">
+      <strong>Validation:</strong> ${a.validationRule}
+    </div>
+    <div class="text-xs text-muted mt-05">
+      At current accuracy (${a.accuracy}%), most predictions route to human review. As accuracy improves, auto-accept share grows.
+    </div>`;
+}
+
+function renderImprovementPlan(a) {
+  const gap = a.projectedAccuracy - a.accuracy;
+  const steps = [];
+  steps.push({action: `Annotate 15 more products from active learning suggestions`, target: Math.min(a.accuracy + Math.round(gap * 0.45), a.projectedAccuracy - 7)});
+  steps.push({action: `Enable image OCR extraction at Plus/Enterprise tiers`, target: Math.min(steps[0].target + Math.round(gap * 0.2), a.projectedAccuracy - 4)});
+  steps.push({action: `Reach 50 examples with corrections from QA review loop`, target: Math.min(steps[1].target + Math.round(gap * 0.15), a.projectedAccuracy - 1)});
+  steps.push({action: `Production threshold reached at ~100 validated examples`, target: a.projectedAccuracy});
+
+  const daysPerStep = [7, 3, 10, 5];
+  const totalDays = daysPerStep.reduce((a,b) => a+b, 0);
+
+  document.getElementById('improvementPlan').innerHTML = `
+    <div class="flex items-center justify-between mb-1">
+      <div>
+        <span class="text-xs text-muted">Current:</span>
+        <strong style="color:var(--dh-red);"> ${a.accuracy}%</strong>
+        <span class="text-xs text-muted">(${a.currentExamples} examples)</span>
+      </div>
+      <div>
+        <span class="text-xs text-muted">Target:</span>
+        <strong style="color:var(--green);"> ${a.projectedAccuracy}%</strong>
+        <span class="text-xs text-muted">(production-ready)</span>
+      </div>
+    </div>
+    <div style="height:6px;background:var(--darker);border-radius:3px;margin-bottom:1rem;overflow:hidden;">
+      <div style="width:${(a.accuracy/a.projectedAccuracy)*100}%;height:100%;background:var(--dh-red);border-radius:3px;"></div>
+    </div>
+    ${steps.map((s, i) => `<div class="flex items-center gap-05 mb-05">
+      <span class="text-xs" style="width:20px;color:var(--muted);font-weight:700;">${i+1}.</span>
+      <span class="text-xs" style="flex:1;">${s.action}</span>
+      <span class="badge b-${s.target >= a.projectedAccuracy ? 'green' : s.target >= a.projectedAccuracy - 7 ? 'amber' : 'gray'}">${s.target}%</span>
+    </div>`).join('')}
+    <div class="text-xs text-muted mt-1" style="border-top:1px solid var(--border);padding-top:0.5rem;">
+      Estimated timeline: ${Math.ceil(totalDays / 7)}-${Math.ceil(totalDays / 5)} weeks with ~10 annotations/day
+    </div>`;
+}
+
+function renderRolloutTimeline(a) {
+  const phases = [
+    {name: 'Enterprise Only', status: 'active', desc: 'Human review on all predictions. Build initial labeled dataset from corrections.', threshold: `${a.currentExamples} examples / ${a.accuracy}% accuracy`, color: 'var(--dh-red)'},
+    {name: 'Plus Expansion', status: 'future', desc: 'Extend to Plus tier. Auto-accept above 85% confidence. QA catches remaining errors.', threshold: '50+ examples / >80% accuracy', color: 'var(--purple)'},
+    {name: 'Pro Rollout', status: 'future', desc: 'Full Pro/Plus/Enterprise coverage. Lite still skipped for cost optimization.', threshold: '100+ examples / >90% accuracy', color: 'var(--blue)'},
+    {name: 'Full Production', status: 'future', desc: 'Optional Lite extraction. Attribute added to title guidelines. Variant grouping considers this attribute.', threshold: '200+ examples / >93% accuracy', color: 'var(--green)'},
+  ];
+
+  document.getElementById('rolloutTimeline').innerHTML = `
+    <div class="card">
+      <div style="display:flex;align-items:stretch;gap:0;">
+        ${phases.map((ph, i) => `<div style="flex:1;position:relative;padding:0.75rem;${i < phases.length - 1 ? 'border-right:2px solid var(--border);' : ''}">
+          <div style="position:absolute;top:0;left:0;right:0;height:4px;background:${ph.status === 'active' ? ph.color : 'var(--border)'};${i === 0 ? 'border-radius:4px 0 0 0;' : ''}${i === phases.length-1 ? 'border-radius:0 4px 0 0;' : ''}"></div>
+          <div class="flex items-center gap-05 mb-05">
+            <span style="width:18px;height:18px;border-radius:50%;background:${ph.status === 'active' ? ph.color : 'var(--card)'};border:2px solid ${ph.status === 'active' ? ph.color : 'var(--border)'};display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:#fff;font-weight:700;">${i+1}</span>
+            <strong class="text-xs" style="color:${ph.status === 'active' ? ph.color : 'var(--muted)'};">${ph.name}</strong>
+          </div>
+          ${ph.status === 'active' ? '<span class="badge b-red" style="font-size:0.55rem;margin-bottom:0.3rem;display:inline-block;">Current</span>' : ''}
+          <p class="text-xs text-muted" style="margin-bottom:0.3rem;">${ph.desc}</p>
+          <p class="text-xs" style="opacity:0.7;">${ph.threshold}</p>
+        </div>`).join('')}
+      </div>
+    </div>`;
 }
 </script>
 

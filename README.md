@@ -53,11 +53,22 @@ End-to-end pipeline simulation. Walks through content enrichment for a realistic
 6. **QA Gate** — Automated quality checks including confidence scoring, language consistency, image-title matching, and dairy guideline compliance. Human-readable rejection/review reasons.
 7. **Results Dashboard** — Variant grouping, cost/quality breakdown by tier, savings analysis
 
+7. **New Attribute Onboarding (Cold-Start)** — Simulates adding a brand-new attribute to the system without labeled data. Choose from 4 preset attributes (Calories, Skin Type, Sugar Content, Fragrance), then see:
+   - Attribute definition with data type, categories, extraction sources, tier availability
+   - Seed examples (few-shot training data) drawn from the loaded catalog
+   - Bootstrap assessment: learning curve, coverage, confidence, accuracy estimate
+   - Prediction preview on unseen products with confidence scores
+   - Active learning suggestions (which products to annotate next for maximum gain)
+   - QA gate configuration with auto-accept/review/reject funnel
+   - Improvement plan with concrete action items and timeline
+   - Tier rollout roadmap: Enterprise-first, expand as accuracy grows
+
 **Key features:**
 - Locale-aware content: titles, flavors, product types, and fat/processing terms are translated per platform language
 - QA detects untranslated foreign terms (e.g., English "Strawberry" in a Turkish title)
 - Tier impact preview shows the same product processed at all four tiers side-by-side
 - Product modal with full enrichment detail, Image Intelligence card, and tier capabilities checklist
+- Cold-start attribute onboarding with learning curve visualization and graduated rollout
 
 ## Sample Data
 
