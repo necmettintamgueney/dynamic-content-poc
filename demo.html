@@ -1113,7 +1113,9 @@ PYA-400002,coca cola original 330ml lata,https://images.deliveryhero.io/image/dh
 PYA-400003,queso crema philadelphia light 200g,https://images.deliveryhero.io/image/dh/philly-light-200g-ar.jpg,Philadelphia,Jumbo Hipermercado,enterprise,ar,packaged_food_beverages,
 PYA-400004,lindt excellence chocolate negro 85% 100g,https://images.deliveryhero.io/image/dh/lindt-85-100g-ar.jpg,Lindt,Jumbo Hipermercado,enterprise,ar,packaged_food_beverages,
 PYA-400005,dove gel de ducha nutricion 500ml,https://images.deliveryhero.io/image/dh/dove-500ml-ar.jpg,Dove,Jumbo Hipermercado,enterprise,ar,packaged_non_food,
-PYA-400006,red bull bebida energetica 250ml 4 pack,https://images.deliveryhero.io/image/dh/redbull-4pack-ar.jpg,Red Bull,Jumbo Hipermercado,enterprise,ar,packaged_food_beverages,`;
+PYA-400006,red bull bebida energetica 250ml 4 pack,https://images.deliveryhero.io/image/dh/redbull-4pack-ar.jpg,Red Bull,Jumbo Hipermercado,enterprise,ar,packaged_food_beverages,
+PYA-000001,yogur entero sancor 200g,https://images.deliveryhero.io/image/dh/sancor-200g-ar.jpg,Sancor,,,,ar,packaged_food_beverages,
+PYA-000002,coca cola 500ml,https://images.deliveryhero.io/image/dh/coke-500ml-un-ar.jpg,Coca-Cola,,,,ar,packaged_food_beverages,`;
   } else if (selectedPlatform === 'yemeksepeti') {
     csv = `master_product_code,product_title,image_url,brand,vendor_name,vendor_tier,region,category,master_category
 YS-100001,SUTAS TAM YAGLI SUT 1L,https://images.deliveryhero.io/image/dh/sutas-sut-1l.jpg,Sutas,Bakkal Mehmet,lite,tr,packaged_food_beverages,
@@ -1140,7 +1142,9 @@ YS-400002,coca cola 330ml kutu 6li paket,https://images.deliveryhero.io/image/dh
 YS-400003,pinar krem peynir light 200g,https://images.deliveryhero.io/image/dh/pinar-krem-light-200g.jpg,Pinar,CarrefourSA,enterprise,tr,packaged_food_beverages,
 YS-400004,lindt excellence bitter cikolata %85 100g,https://images.deliveryhero.io/image/dh/lindt-85-100g-tr.jpg,Lindt,CarrefourSA,enterprise,tr,packaged_food_beverages,
 YS-400005,dove dus jeli besleyici 500ml,https://images.deliveryhero.io/image/dh/dove-500ml-tr.jpg,Dove,CarrefourSA,enterprise,tr,packaged_non_food,
-YS-400006,red bull enerji icecegi 250ml 4lu,https://images.deliveryhero.io/image/dh/redbull-4pack-tr.jpg,Red Bull,CarrefourSA,enterprise,tr,packaged_food_beverages,`;
+YS-400006,red bull enerji icecegi 250ml 4lu,https://images.deliveryhero.io/image/dh/redbull-4pack-tr.jpg,Red Bull,CarrefourSA,enterprise,tr,packaged_food_beverages,
+YS-000001,sutas yogurt 200g,https://images.deliveryhero.io/image/dh/sutas-yogurt-200g.jpg,Sutas,,,,tr,packaged_food_beverages,
+YS-000002,coca cola 330ml kutu,https://images.deliveryhero.io/image/dh/coke-330ml-un-tr.jpg,Coca-Cola,,,,tr,packaged_food_beverages,`;
   } else {
     csv = `master_product_code,product_title,image_url,brand,vendor_name,vendor_tier,region,category,master_category
 MPC-100001,almrai ful fat mlk 1l,https://images.deliveryhero.io/image/dh/almarai-milk-1l.jpg,Almarai,Al-Maha Mini Market,lite,ae,packaged_food_beverages,
@@ -1240,7 +1244,9 @@ MPC-700002,pepsi max zero sugar 330ml 6 pack,https://images.deliveryhero.io/imag
 MPC-700003,omo auto liquid detergent 2L,https://images.deliveryhero.io/image/dh/omo-2l.jpg,Omo,Lulu Hypermarket,plus,ae,packaged_non_food,
 MPC-700004,toblerone milk chocolate 100g,https://images.deliveryhero.io/image/dh/toblerone-100g.jpg,Toblerone,Lulu Hypermarket,plus,ae,packaged_food_beverages,
 MPC-700005,fresh strawberries 250g pack,https://images.deliveryhero.io/image/dh/strawberries-250g.jpg,Local Farm,Lulu Hypermarket,plus,ae,ultrafresh_loose_food_beverages,
-MPC-700006,braun series 5 shaver,https://images.deliveryhero.io/image/dh/braun-s5.jpg,Braun,Lulu Hypermarket,plus,ae,electronics,`;
+MPC-700006,braun series 5 shaver,https://images.deliveryhero.io/image/dh/braun-s5.jpg,Braun,Lulu Hypermarket,plus,ae,electronics,
+MPC-000001,almarai fresh milk 500ml,https://images.deliveryhero.io/image/dh/almarai-fresh-500ml.jpg,Almarai,,,,ae,packaged_food_beverages,
+MPC-000002,dove shampoo 400ml,https://images.deliveryhero.io/image/dh/dove-shampoo-400ml.jpg,Dove,,,,ae,packaged_non_food,`;
   }
   products = parseCSV(csv);
   processProducts();
@@ -1250,9 +1256,13 @@ MPC-700006,braun series 5 shaver,https://images.deliveryhero.io/image/dh/braun-s
 // ===== PROCESS PRODUCTS =====
 function processProducts() {
   processed = products.map((p, idx) => {
-    const tier = (p.vendor_tier || 'lite').toLowerCase();
+    const isUnassigned = !p.vendor_name || p.vendor_name.trim() === '';
+    if (isUnassigned) p.vendor_name = 'Unassigned';
+    const tier = isUnassigned ? 'lite' : (p.vendor_tier || 'lite').toLowerCase();
     const cat = p.category || 'packaged_food_beverages';
-    const roi = computeROI(p, idx);
+    const roi = isUnassigned
+      ? {signal:'N/A', reason:'No vendor assigned — baseline Lite tier processing. ROI override and tier promotion are not available until a vendor is assigned.', override:false, direction:'none', newTier:'lite'}
+      : computeROI(p, idx);
     const finalTier = roi.override ? roi.newTier : tier;
     const titleModel = MODEL_ASSIGN['Title Generation'][finalTier];
 
@@ -1273,6 +1283,7 @@ function processProducts() {
 
     return {
       ...p,
+      isUnassigned,
       originalTier: tier,
       roi,
       finalTier,
@@ -1787,16 +1798,21 @@ function renderStep2() {
 
   const tbody = document.getElementById('tierTableBody');
   tbody.innerHTML = processed.map(p => {
-    const roiBadge = p.roi.signal === 'High' ? 'b-green' : p.roi.signal === 'Low' ? 'b-red' : 'b-amber';
-    const overrideText = p.roi.direction === 'promoted'
+    const roiBadge = p.isUnassigned ? 'b-gray' : p.roi.signal === 'High' ? 'b-green' : p.roi.signal === 'Low' ? 'b-red' : 'b-amber';
+    const overrideText = p.isUnassigned
+      ? `<span class="text-xs text-muted">—</span>`
+      : p.roi.direction === 'promoted'
       ? `<span class="badge b-green">&#8593; Promoted to ${TIER_LABELS[p.finalTier]}</span>`
       : p.roi.direction === 'downgraded'
       ? `<span class="badge b-red">&#8595; Downgraded to ${TIER_LABELS[p.finalTier]}</span>`
       : `<span class="text-xs text-muted">No override</span>`;
+    const vendorDisplay = p.isUnassigned
+      ? `<span class="badge b-gray" style="opacity:0.7;">Unassigned</span>`
+      : p.vendor_name;
     return `<tr class="clickable" onclick="showProductModal('${p.master_product_code}')">
       <td>${truncate(p.product_title, 35)}</td>
       <td>${p.brand}</td>
-      <td class="text-xs">${p.vendor_name}</td>
+      <td class="text-xs">${vendorDisplay}</td>
       <td><span class="badge b-${p.originalTier === 'enterprise' ? 'red' : p.originalTier === 'plus' ? 'purple' : p.originalTier === 'pro' ? 'blue' : 'gray'}">${TIER_LABELS[p.originalTier]}</span></td>
       <td><span class="badge ${roiBadge}">${p.roi.signal}</span></td>
       <td>${overrideText}</td>
@@ -2161,7 +2177,7 @@ function showProductModal(code) {
       ${imgThumb(p.image_url, 64)}
       <div>
         <h2 style="margin-bottom:0.25rem;">${p.generatedTitle}</h2>
-        <p class="text-xs text-muted">${p.vendor_name}</p>
+        <p class="text-xs text-muted">${p.isUnassigned ? '<span class="badge b-gray" style="opacity:0.7;">Unassigned</span>' : p.vendor_name}</p>
       </div>
     </div>
 
@@ -2200,9 +2216,11 @@ function showProductModal(code) {
     <h3 class="mb-05">ROI Assessment</h3>
     <div class="card card-sm mb-2">
       <div class="flex items-center gap-05">
-        <span class="badge ${p.roi.signal === 'High' ? 'b-green' : p.roi.signal === 'Low' ? 'b-red' : 'b-amber'}">${p.roi.signal} ROI</span>
-        ${p.roi.direction === 'promoted' ? `<span class="badge b-green">Promoted: ${TIER_LABELS[p.originalTier]} &#8594; ${TIER_LABELS[p.finalTier]}</span>` : ''}
-        ${p.roi.direction === 'downgraded' ? `<span class="badge b-red">Downgraded: ${TIER_LABELS[p.originalTier]} &#8594; ${TIER_LABELS[p.finalTier]}</span>` : ''}
+        ${p.isUnassigned
+          ? '<span class="badge b-gray" style="opacity:0.7;">N/A</span>'
+          : `<span class="badge ${p.roi.signal === 'High' ? 'b-green' : p.roi.signal === 'Low' ? 'b-red' : 'b-amber'}">${p.roi.signal} ROI</span>`}
+        ${!p.isUnassigned && p.roi.direction === 'promoted' ? `<span class="badge b-green">Promoted: ${TIER_LABELS[p.originalTier]} &#8594; ${TIER_LABELS[p.finalTier]}</span>` : ''}
+        ${!p.isUnassigned && p.roi.direction === 'downgraded' ? `<span class="badge b-red">Downgraded: ${TIER_LABELS[p.originalTier]} &#8594; ${TIER_LABELS[p.finalTier]}</span>` : ''}
       </div>
       <p class="text-xs text-muted mt-05">${p.roi.reason}</p>
     </div>

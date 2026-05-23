@@ -41,7 +41,7 @@ End-to-end pipeline simulation. Walks through content enrichment for a realistic
 **Flow:**
 1. **Platform Selection** — Choose Talabat (MENA, English), PedidosYa (LATAM, Spanish), or Yemeksepeti (Turkey, Turkish)
 2. **Upload / Load Sample** — Upload a CSV or load the embedded sample dataset (20-98 products depending on platform)
-3. **Tier & ROI** — Each product is assigned a vendor tier (Lite/Pro/Plus/Enterprise) with ROI-based overrides
+3. **Tier & ROI** — Each product is assigned a vendor tier (Lite/Pro/Plus/Enterprise) with ROI-based overrides. Products without a vendor assignment stay at Lite with no ROI override.
 4. **Model Selection** — 5-task model matrix (Title Generation, Attribute Extraction, Category Prediction, Variant Grouping, Image Analysis) with per-tier model assignment and reasoning
 5. **Content Generation** — Side-by-side before/after title transformation with tier-differentiated enrichment. Includes:
    - Typo correction (all tiers)
@@ -94,3 +94,4 @@ Enriched attributes include: `generic_name`, `content_value`, `content_unit`, `f
 - **Deterministic simulation** — All enrichment, QA scoring, and model assignment is computed from product attributes. Reproducible across demos.
 - **Locale-aware** — Flavor translations, product type inference, fat/processing terms, and QA language checks are all driven by the selected platform's locale.
 - **Tier controls what gets added, never what gets removed** — Information present in the raw title is always preserved regardless of tier. Tiers only control whether missing values are inferred.
+- **Unassigned vendor = Lite baseline** — Products without a vendor assignment are locked to Lite tier. ROI overrides are skipped (even for high-value brands), but locale-based cost/confidence multipliers still apply since those reflect input complexity, not vendor quality.
