@@ -2,1619 +2,335 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dynamic Content Strategy — Vision POC</title>
+<title>Dynamic Content — Delivery Hero</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="assets/dh-logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --dh-red: #D4213D;
-    --dh-dark: #1a1a2e;
-    --dh-darker: #0f0f1e;
-    --dh-card: #16213e;
-    --dh-card-hover: #1a2744;
-    --green: #10b981;
-    --amber: #f59e0b;
-    --blue: #3b82f6;
-    --purple: #8b5cf6;
-    --cyan: #06b6d4;
-    --gray: #94a3b8;
-    --text: #e2e8f0;
-    --text-muted: #94a3b8;
-    --border: #1e3a5f;
+    --bg: #FAFAF7;
+    --surface: #FFFFFF;
+    --surface-2: #F4F4EF;
+    --surface-3: #ECECE5;
+    --ink: #1B1F2A;
+    --ink-soft: #4A5260;
+    --ink-mute: #6B7280;
+    --ink-faint: #9BA0AB;
+    --border: #E4E4DD;
+    --border-strong: #CFCFC6;
+    --dh-red: #D61F26;
+    --red-tint: #FCE8E9;
+    --red-edge: #F2C9CB;
+    --green: #00A86B;
+    --green-2: #008C58;
+    --green-tint: #E4F6EC;
+    --green-edge: #BFE5CF;
+    --amber: #C8870D;
+    --amber-tint: #FBF0D6;
+    --amber-edge: #ECCF93;
+    --blue: #0066B3;
+    --blue-2: #004F8C;
+    --blue-tint: #E1EEF7;
+    --blue-edge: #B7D6EC;
+    --purple: #7B3FA0;
+    --purple-tint: #F1E7F8;
+    --font: "Outfit", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+    --radius-sm: 6px;
+    --radius: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 22px;
+    --shadow-1: 0 1px 2px rgba(20,22,30,0.04), 0 1px 1px rgba(20,22,30,0.03);
+    --shadow-2: 0 4px 14px -6px rgba(20,22,30,0.10), 0 2px 4px rgba(20,22,30,0.04);
+    --shadow-3: 0 12px 32px -12px rgba(20,22,30,0.16);
   }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: var(--dh-darker);
-    color: var(--text);
-    overflow-x: hidden;
+    font-feature-settings: "ss01", "ss02", "cv11";
+    background:
+      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(214,31,38,0.05), transparent 60%),
+      var(--bg);
   }
+  .eyebrow {
+    font-family: var(--font); font-weight: 600; font-size: 11px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+  .mono { font-family: var(--mono); }
 
-  /* NAV */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    background: rgba(15, 15, 30, 0.95);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 2rem; height: 56px;
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
-  nav .logo {
-    font-weight: 700; font-size: 1rem; color: var(--dh-red);
-    letter-spacing: -0.02em;
+  @keyframes drift {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-4px); }
   }
-  nav .logo span { color: var(--text); font-weight: 400; }
-  nav ul { list-style: none; display: flex; gap: 0.25rem; }
-  nav ul li a {
-    color: var(--text-muted); text-decoration: none;
-    padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem;
-    transition: all 0.2s;
-  }
-  nav ul li a:hover, nav ul li a.active {
-    color: var(--text); background: var(--dh-card);
-  }
-
-  /* SECTIONS */
-  section {
-    min-height: 100vh; padding: 5rem 2rem 3rem;
-    max-width: 1400px; margin: 0 auto;
-    display: none;
-  }
-  section.active { display: block; }
-
-  h1 { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 0.5rem; }
-  h2 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 1rem; color: var(--text); }
-  h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
-
-  .subtitle { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 2rem; max-width: 700px; }
-
-  /* CARDS */
-  .card {
-    background: var(--dh-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    transition: all 0.2s;
-  }
-  .card:hover { background: var(--dh-card-hover); border-color: #2a4a6f; }
-
-  /* GRID */
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-
-  /* BADGES */
-  .badge {
-    display: inline-block; padding: 0.2rem 0.6rem; border-radius: 99px;
-    font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
-  }
-  .badge-red { background: rgba(212,33,61,0.15); color: var(--dh-red); }
-  .badge-green { background: rgba(16,185,129,0.15); color: var(--green); }
-  .badge-amber { background: rgba(245,158,11,0.15); color: var(--amber); }
-  .badge-blue { background: rgba(59,130,246,0.15); color: var(--blue); }
-  .badge-purple { background: rgba(139,92,246,0.15); color: var(--purple); }
-  .badge-cyan { background: rgba(6,182,212,0.15); color: var(--cyan); }
-
-  /* METRIC BOX */
-  .metric-box {
-    background: var(--dh-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.25rem;
-    text-align: center;
-  }
-  .metric-box .value {
-    font-size: 2rem; font-weight: 700; letter-spacing: -0.02em;
-  }
-  .metric-box .label {
-    font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;
-  }
-  .metric-box .delta {
-    font-size: 0.75rem; margin-top: 0.25rem; font-weight: 600;
-  }
-  .delta-up { color: var(--green); }
-  .delta-down { color: var(--dh-red); }
-
-  /* BUTTONS */
-  .btn {
-    padding: 0.6rem 1.2rem; border-radius: 8px; border: none;
-    font-size: 0.85rem; font-weight: 600; cursor: pointer;
-    transition: all 0.2s;
-  }
-  .btn-primary { background: var(--dh-red); color: #fff; }
-  .btn-primary:hover { background: #b91c33; }
-  .btn-secondary { background: var(--dh-card); color: var(--text); border: 1px solid var(--border); }
-  .btn-secondary:hover { background: var(--dh-card-hover); }
-  .btn-sm { padding: 0.35rem 0.8rem; font-size: 0.75rem; }
-  .btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-
-  /* PROGRESS BAR */
-  .progress-bar {
-    width: 100%; height: 8px; background: rgba(255,255,255,0.08);
-    border-radius: 99px; overflow: hidden;
-  }
-  .progress-bar .fill {
-    height: 100%; border-radius: 99px; transition: width 0.8s ease;
-  }
-
-  /* TABLE */
-  .data-table {
-    width: 100%; border-collapse: collapse; font-size: 0.85rem;
-  }
-  .data-table th {
-    text-align: left; padding: 0.75rem 1rem; color: var(--text-muted);
-    font-weight: 500; font-size: 0.75rem; text-transform: uppercase;
-    letter-spacing: 0.05em; border-bottom: 1px solid var(--border);
-  }
-  .data-table td {
-    padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.04);
-  }
-  .data-table tr:hover td { background: rgba(255,255,255,0.02); }
-
-  /* LOOP DIAGRAM */
-  .loop-container {
-    position: relative;
-    width: 600px; height: 600px;
-    margin: 2rem auto;
-  }
-  .loop-node {
-    position: absolute;
-    width: 140px; padding: 0.75rem;
-    background: var(--dh-card);
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    text-align: center;
-    font-size: 0.75rem; font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    z-index: 2;
-  }
-  .loop-node:hover, .loop-node.active {
-    border-color: var(--dh-red);
-    background: var(--dh-card-hover);
-    transform: scale(1.08);
-    box-shadow: 0 0 30px rgba(212,33,61,0.2);
-  }
-  .loop-node .icon { font-size: 1.5rem; margin-bottom: 0.3rem; }
-  .loop-canvas {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    z-index: 1;
-  }
-
-  /* PIPELINE */
-  .pipeline {
-    display: flex; align-items: stretch; gap: 0;
-    margin: 2rem 0; overflow-x: auto; padding-bottom: 1rem;
-  }
-  .pipeline-stage {
-    flex: 1; min-width: 180px;
-    padding: 1.25rem 1rem;
-    background: var(--dh-card);
-    border: 1px solid var(--border);
-    position: relative;
-    transition: all 0.5s;
-    opacity: 0.4;
-  }
-  .pipeline-stage.done {
-    opacity: 1;
-    border-color: var(--green);
-    background: rgba(16,185,129,0.05);
-  }
-  .pipeline-stage.active-stage {
-    opacity: 1;
-    border-color: var(--dh-red);
-    background: rgba(212,33,61,0.05);
-    animation: pulse-border 1.5s infinite;
-  }
-  .pipeline-stage:first-child { border-radius: 12px 0 0 12px; }
-  .pipeline-stage:last-child { border-radius: 0 12px 12px 0; }
-  .pipeline-stage .stage-num {
-    font-size: 0.65rem; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 0.1em;
-    margin-bottom: 0.3rem;
-  }
-  .pipeline-stage .stage-title {
-    font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem;
-  }
-  .pipeline-stage .stage-detail {
-    font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;
-  }
-  .pipeline-arrow {
-    width: 24px; flex-shrink: 0; display: flex;
-    align-items: center; justify-content: center;
-    color: var(--border); font-size: 1.2rem;
-  }
-
-  @keyframes pulse-border {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(212,33,61,0.3); }
-    50% { box-shadow: 0 0 20px 4px rgba(212,33,61,0.15); }
-  }
-
-  /* QA FEED */
-  .qa-feed {
-    max-height: 400px; overflow-y: auto;
-    display: flex; flex-direction: column; gap: 0.5rem;
-  }
-  .qa-item {
-    display: flex; align-items: flex-start; gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    background: var(--dh-card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 0.8rem;
-    animation: fadeSlideIn 0.4s ease;
-  }
-  .qa-item .dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    margin-top: 5px; flex-shrink: 0;
-  }
-  .qa-item .timestamp {
-    color: var(--text-muted); font-size: 0.7rem;
-    white-space: nowrap;
-  }
-
-  @keyframes fadeSlideIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* TIER CARDS */
-  .tier-card {
-    background: var(--dh-card);
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    cursor: pointer;
-    transition: all 0.3s;
-    position: relative;
-    overflow: hidden;
-  }
-  .tier-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  }
-  .tier-card.selected {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-  }
-  .tier-lite::before { background: var(--gray); }
-  .tier-lite.selected { border-color: var(--gray); }
-  .tier-pro::before { background: var(--blue); }
-  .tier-pro.selected { border-color: var(--blue); }
-  .tier-plus::before { background: var(--purple); }
-  .tier-plus.selected { border-color: var(--purple); }
-  .tier-enterprise::before { background: var(--dh-red); }
-  .tier-enterprise.selected { border-color: var(--dh-red); }
-
-  .tier-card .tier-name {
-    font-weight: 700; font-size: 1.1rem; margin-bottom: 0.25rem;
-  }
-  .tier-card .tier-desc {
-    font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;
-  }
-  .tier-card .tier-features {
-    list-style: none; font-size: 0.8rem;
-  }
-  .tier-card .tier-features li {
-    padding: 0.2rem 0;
-    display: flex; align-items: center; gap: 0.4rem;
-  }
-  .tier-card .tier-features li .check { color: var(--green); }
-  .tier-card .tier-features li .cross { color: #ef4444; opacity: 0.4; }
-
-  /* PRODUCT CARD for pipeline */
-  .product-card-demo {
-    background: var(--dh-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    max-width: 500px;
-    margin: 1.5rem auto;
-    transition: all 0.3s;
-  }
-  .product-card-demo .product-title {
-    font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;
-  }
-  .product-card-demo .product-attrs {
-    display: flex; flex-wrap: wrap; gap: 0.5rem;
-    margin-top: 0.75rem;
-  }
-  .product-card-demo .attr-tag {
-    padding: 0.2rem 0.6rem;
-    background: rgba(255,255,255,0.06);
-    border-radius: 6px;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-  }
-  .attr-tag.filled { background: rgba(16,185,129,0.12); color: var(--green); }
-  .attr-tag.missing { background: rgba(239,68,68,0.12); color: #ef4444; }
-  .attr-tag.enriched { background: rgba(139,92,246,0.12); color: var(--purple); }
-
-  /* MODEL STORE TABLE */
-  .model-winner {
-    background: rgba(16,185,129,0.08) !important;
-  }
-  .model-winner td:first-child {
-    border-left: 3px solid var(--green);
-  }
-
-  /* COMPARISON */
-  .comparison {
-    display: grid; grid-template-columns: 1fr auto 1fr; gap: 2rem;
-    align-items: start; margin: 2rem 0;
-  }
-  .comparison-arrow {
-    display: flex; align-items: center; font-size: 2rem;
-    color: var(--green); padding-top: 2rem;
-  }
-  .comparison .card h3 {
-    display: flex; align-items: center; gap: 0.5rem;
-  }
-
-  /* ROADMAP */
-  .roadmap-track {
-    position: relative; padding-left: 3rem;
-  }
-  .roadmap-track::before {
-    content: ''; position: absolute;
-    left: 1rem; top: 0; bottom: 0; width: 2px;
-    background: linear-gradient(to bottom, var(--dh-red), var(--purple), var(--blue), var(--green));
-  }
-  .roadmap-phase {
-    position: relative; margin-bottom: 2rem;
-    padding: 1.5rem;
-    background: var(--dh-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-  }
-  .roadmap-phase::before {
-    content: ''; position: absolute;
-    left: -2.35rem; top: 1.5rem;
-    width: 14px; height: 14px;
-    border-radius: 50%;
-    border: 3px solid var(--dh-darker);
-  }
-  .roadmap-phase:nth-child(1)::before { background: var(--dh-red); }
-  .roadmap-phase:nth-child(2)::before { background: var(--purple); }
-  .roadmap-phase:nth-child(3)::before { background: var(--blue); }
-  .roadmap-phase:nth-child(4)::before { background: var(--green); }
-  .roadmap-phase .phase-tag {
-    font-size: 0.7rem; text-transform: uppercase;
-    letter-spacing: 0.1em; font-weight: 600; margin-bottom: 0.3rem;
-  }
-  .roadmap-pillars {
-    display: flex; gap: 0.3rem; flex-wrap: wrap; margin-top: 0.75rem;
-  }
-
-  /* MISC */
-  .flex { display: flex; }
-  .flex-col { flex-direction: column; }
-  .gap-1 { gap: 1rem; }
-  .gap-2 { gap: 2rem; }
-  .items-center { align-items: center; }
-  .justify-between { justify-content: space-between; }
-  .mt-1 { margin-top: 1rem; }
-  .mt-2 { margin-top: 2rem; }
-  .mb-1 { margin-bottom: 1rem; }
-  .mb-2 { margin-bottom: 2rem; }
-  .text-sm { font-size: 0.85rem; }
-  .text-xs { font-size: 0.75rem; }
-  .text-muted { color: var(--text-muted); }
-  .text-green { color: var(--green); }
-  .text-red { color: var(--dh-red); }
-  .text-amber { color: var(--amber); }
-  .text-center { text-align: center; }
-  .w-full { width: 100%; }
-  .font-mono { font-family: 'SF Mono', 'Fira Code', monospace; }
-
-  /* STATUS INDICATOR */
-  .status-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    display: inline-block; margin-right: 0.4rem;
-  }
-  .status-dot.green { background: var(--green); box-shadow: 0 0 6px var(--green); }
-  .status-dot.amber { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
-  .status-dot.red { background: var(--dh-red); box-shadow: 0 0 6px var(--dh-red); }
-
-  /* HERO SECTION */
-  #overview { padding-top: 6rem; }
-  .hero-statement {
-    font-size: 1.15rem; line-height: 1.7; max-width: 800px;
-    color: var(--text-muted); margin-bottom: 3rem;
-    border-left: 3px solid var(--dh-red);
-    padding-left: 1.5rem;
-  }
-  .hero-statement strong { color: var(--text); }
-
-  /* SCROLL */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-  /* ANIMATED NUMBER */
-  .anim-number { transition: all 0.5s; }
-
-  /* RESPONSIVE */
-  @media (max-width: 900px) {
-    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-    .comparison { grid-template-columns: 1fr; }
-    .comparison-arrow { justify-content: center; padding-top: 0; }
-    .loop-container { width: 100%; }
-    h1 { font-size: 1.8rem; }
-    .pipeline { flex-direction: column; }
-    .pipeline-stage:first-child { border-radius: 12px 12px 0 0; }
-    .pipeline-stage:last-child { border-radius: 0 0 12px 12px; }
-    .pipeline-arrow { transform: rotate(90deg); width: auto; }
-  }
+  .fade-up { animation: fadeUp 520ms cubic-bezier(0.2,0.7,0.2,1) both; }
 </style>
 </head>
 <body>
+<div id="root"></div>
 
-<nav>
-  <div class="logo">Dynamic Content <span>Strategy</span></div>
-  <ul>
-    <li><a href="#" class="active" onclick="showSection('overview')">Overview</a></li>
-    <li><a href="#" onclick="showSection('pipeline')">Pipeline</a></li>
-    <li><a href="#" onclick="showSection('modelstore')">Model Store</a></li>
-    <li><a href="#" onclick="showSection('qa')">QA Monitor</a></li>
-    <li><a href="#" onclick="showSection('roadmap')">Roadmap</a></li>
-  </ul>
-</nav>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 
-<!-- ======================== OVERVIEW ======================== -->
-<section id="overview" class="active">
-  <h1>From Open Loop to Closed Loop</h1>
-  <div class="hero-statement">
-    The content process today is an <strong>open loop</strong>. Each stage runs without informing the next, and almost nothing flows back.
-    The strategy closes it: <strong>budget is known before design</strong>, investment scales with value, quality is a defined target,
-    the right model is always running, and production problems are detected and fixed in days.
-  </div>
+<script type="text/babel" src="dc-brand.jsx"></script>
+<script type="text/babel">
+const TEAM = [
+  { name: "Necmettin Tamgüney", role: "Product Lead",          tint: "var(--red-tint)",    edge: "var(--red-edge)",    accent: "var(--dh-red)" },
+  { name: "Sarvesh Patil",       role: "Engineering Lead",     tint: "var(--blue-tint)",    edge: "var(--blue-edge)",    accent: "var(--blue)" },
+  { name: "Ameer Hamza",         role: "Senior ML Engineer",   tint: "var(--purple-tint)",  edge: "#D9C2E8",             accent: "var(--purple)" },
+  { name: "Bhavya Jain",         role: "Senior Data Scientist", tint: "var(--amber-tint)",  edge: "var(--amber-edge)",   accent: "var(--amber)" },
+  { name: "Gabriel Straub",      role: "Senior Backend Engineer", tint: "var(--green-tint)", edge: "var(--green-edge)",  accent: "var(--green-2)" },
+  { name: "Amit Sharma",         role: "Senior Backend Engineer", tint: "var(--blue-tint)",  edge: "var(--blue-edge)",   accent: "var(--blue)" },
+  { name: "Nikhil Kulkarni",     role: "Backend Engineer",     tint: "var(--surface-2)",    edge: "var(--border-strong)", accent: "var(--ink-soft)" },
+  { name: "Prashanth M",         role: "Backend Engineer",     tint: "var(--red-tint)",    edge: "var(--red-edge)",    accent: "var(--dh-red)" },
+];
 
-  <!-- Key Metrics: Today -->
-  <h2>Today's Reality</h2>
-  <div class="grid-4 mb-2">
-    <div class="metric-box">
-      <div class="value text-red">66.6%</div>
-      <div class="label">Title Correction Rate</div>
-      <div class="delta delta-down">needs correction</div>
-    </div>
-    <div class="metric-box">
-      <div class="value text-amber">Uniform</div>
-      <div class="label">Investment per Product</div>
-      <div class="delta delta-down">no differentiation</div>
-    </div>
-    <div class="metric-box">
-      <div class="value text-amber">Months</div>
-      <div class="label">Model Evaluation Cycle</div>
-      <div class="delta delta-down">manual, per project</div>
-    </div>
-    <div class="metric-box">
-      <div class="value text-red">Weeks</div>
-      <div class="label">Problem Detection Lag</div>
-      <div class="delta delta-down">via correction data</div>
-    </div>
-  </div>
-
-  <!-- 6 Problems -->
-  <h2 class="mt-2">Six Failure Points</h2>
-  <div class="grid-3 mb-2">
-    <div class="card">
-      <div class="flex items-center gap-1 mb-1">
-        <span class="badge badge-red">P1</span>
-        <h3 style="margin:0">Budget Unknown</h3>
-      </div>
-      <p class="text-sm text-muted">We design a content solution before we know what it is allowed to cost. Effort goes into options that were never viable.</p>
-    </div>
-    <div class="card">
-      <div class="flex items-center gap-1 mb-1">
-        <span class="badge badge-red">P2</span>
-        <h3 style="margin:0">Uniform Spend</h3>
-      </div>
-      <p class="text-sm text-muted">A product going to one small local vendor receives the same investment as a product going live across a strategic partner.</p>
-    </div>
-    <div class="card">
-      <div class="flex items-center gap-1 mb-1">
-        <span class="badge badge-amber">P3</span>
-        <h3 style="margin:0">Slow Evaluation</h3>
-      </div>
-      <p class="text-sm text-muted">Without a defined quality target, evaluation is slow and subjective. Adopting a new model is a separate development project every time.</p>
-    </div>
-    <div class="card">
-      <div class="flex items-center gap-1 mb-1">
-        <span class="badge badge-red">P4</span>
-        <h3 style="margin:0">No Observability</h3>
-      </div>
-      <p class="text-sm text-muted">We learn about quality problems weeks later through correction data, if at all. Production is largely unobserved.</p>
-    </div>
-    <div class="card">
-      <div class="flex items-center gap-1 mb-1">
-        <span class="badge badge-amber">P5</span>
-        <h3 style="margin:0">Slow Reaction</h3>
-      </div>
-      <p class="text-sm text-muted">Even once a problem is known, shipping a fix is another development cycle. Detection to resolution is measured in months.</p>
-    </div>
-    <div class="card">
-      <div class="flex items-center gap-1 mb-1">
-        <span class="badge badge-amber">P6</span>
-        <h3 style="margin:0">Minor Fixes Ignored</h3>
-      </div>
-      <p class="text-sm text-muted">Small, recurring issues never reach the top of a backlog. The "add 1 Piece" pattern (19-34% of corrections) persists indefinitely.</p>
-    </div>
-  </div>
-
-  <!-- The Solution: 6 Pillars -->
-  <h2 class="mt-2">Six Pillars Close the Loop</h2>
-  <div class="grid-3 mb-2">
-    <div class="card" style="border-left: 3px solid var(--gray);">
-      <div class="flex items-center gap-1 mb-1">
-        <span class="badge badge-blue">Pillar 1</span>
-      </div>
-      <h3>Tiered Onboarding</h3>
-      <p class="text-sm text-muted">Vendor tier sets the investment envelope before any content work begins.</p>
-      <div class="mt-1"><span class="badge badge-red">P1</span> <span class="badge badge-red">P2</span></div>
-    </div>
-    <div class="card" style="border-left: 3px solid var(--blue);">
-      <div class="flex items-center gap-1 mb-1">
-        <span class="badge badge-blue">Pillar 2</span>
-      </div>
-      <h3>ROI Override</h3>
-      <p class="text-sm text-muted">Expected return refines the tier decision per product. The fine adjustment on top of coarse tiering.</p>
-      <div class="mt-1"><span class="badge badge-red">P2</span></div>
-    </div>
-    <div class="card" style="border-left: 3px solid var(--green);">
-      <div class="flex items-center gap-1 mb-1">
-        <span class="badge badge-green">Pillar 3</span>
-      </div>
-      <h3>Foundational Quality</h3>
-      <p class="text-sm text-muted">Close the gaps that stop the baseline from being trusted. The precondition for everything else.</p>
-      <div class="mt-1"><span class="badge badge-red">P4</span></div>
-    </div>
-    <div class="card" style="border-left: 3px solid var(--purple);">
-      <div class="flex items-center gap-1 mb-1">
-        <span class="badge badge-purple">Pillar 4</span>
-      </div>
-      <h3>Guidelines & Acceptance</h3>
-      <p class="text-sm text-muted">Define what good content looks like, per category. The target everything else references.</p>
-      <div class="mt-1"><span class="badge badge-amber">P3</span> <span class="badge badge-red">P4</span></div>
-    </div>
-    <div class="card" style="border-left: 3px solid var(--cyan);">
-      <div class="flex items-center gap-1 mb-1">
-        <span class="badge badge-cyan">Pillar 5</span>
-      </div>
-      <h3>Model Store</h3>
-      <p class="text-sm text-muted">Always run the right model for each task and tier. Automatic benchmarking and switching.</p>
-      <div class="mt-1"><span class="badge badge-amber">P3</span></div>
-    </div>
-    <div class="card" style="border-left: 3px solid var(--dh-red);">
-      <div class="flex items-center gap-1 mb-1">
-        <span class="badge badge-red">Pillar 6</span>
-      </div>
-      <h3>Continuous QA & Herogen</h3>
-      <p class="text-sm text-muted">Watch production, fix what is safe, escalate what is not. The loop that makes improvements ship continuously.</p>
-      <div class="mt-1"><span class="badge badge-red">P4</span> <span class="badge badge-amber">P5</span> <span class="badge badge-amber">P6</span></div>
-    </div>
-  </div>
-
-  <!-- The Loop Diagram -->
-  <h2 class="mt-2 text-center">The Closed Loop</h2>
-  <p class="text-center text-muted text-sm mb-2">Click any node to see its role in the system</p>
-  <div class="loop-container" id="loopDiagram">
-    <svg class="loop-canvas" id="loopSvg"></svg>
-    <div class="loop-node" id="ln-budget" style="top:20px;left:230px;" onclick="highlightNode('budget')">
-      <div class="icon">&#x1F4B0;</div>
-      <div>Budget is known<br>before design</div>
-    </div>
-    <div class="loop-node" id="ln-target" style="top:140px;left:430px;" onclick="highlightNode('target')">
-      <div class="icon">&#x1F3AF;</div>
-      <div>Quality target<br>is defined</div>
-    </div>
-    <div class="loop-node" id="ln-model" style="top:320px;left:440px;" onclick="highlightNode('model')">
-      <div class="icon">&#x1F916;</div>
-      <div>Model chosen<br>automatically</div>
-    </div>
-    <div class="loop-node" id="ln-qa" style="top:440px;left:250px;" onclick="highlightNode('qa')">
-      <div class="icon">&#x2705;</div>
-      <div>Output QA'd<br>inline</div>
-    </div>
-    <div class="loop-node" id="ln-monitor" style="top:340px;left:30px;" onclick="highlightNode('monitor')">
-      <div class="icon">&#x1F50D;</div>
-      <div>Production<br>observed</div>
-    </div>
-    <div class="loop-node" id="ln-fix" style="top:160px;left:15px;" onclick="highlightNode('fix')">
-      <div class="icon">&#x26A1;</div>
-      <div>Problems<br>fixed fast</div>
-    </div>
-    <div class="loop-node" id="ln-learn" style="top:10px; left:100px; width:110px;" onclick="highlightNode('learn')">
-      <div class="icon">&#x1F504;</div>
-      <div>Learnings<br>feed back</div>
-    </div>
-  </div>
-  <div id="loopDetail" class="card mt-1" style="max-width:600px;margin:1rem auto;display:none;">
-    <p id="loopDetailText" class="text-sm"></p>
-  </div>
-</section>
-
-<!-- ======================== PIPELINE DEMO ======================== -->
-<section id="pipeline">
-  <h1>Product Pipeline Simulator</h1>
-  <p class="subtitle">See how a product flows through the system. Select a tier to watch how investment depth changes the outcome.</p>
-
-  <!-- Tier selection -->
-  <h2>1. Select Vendor Tier</h2>
-  <div class="grid-4 mb-2" id="tierSelection">
-    <div class="tier-card tier-lite" onclick="selectTier('lite')">
-      <div class="tier-name" style="color:var(--gray)">Lite</div>
-      <div class="tier-desc">Single local vendor, low volume</div>
-      <ul class="tier-features">
-        <li><span class="check">&#10003;</span> Baseline title</li>
-        <li><span class="check">&#10003;</span> Master category</li>
-        <li><span class="check">&#10003;</span> Brand</li>
-        <li><span class="cross">&#10005;</span> Deep enrichment</li>
-        <li><span class="cross">&#10005;</span> Variant grouping</li>
-        <li><span class="cross">&#10005;</span> Premium model</li>
-      </ul>
-    </div>
-    <div class="tier-card tier-pro" onclick="selectTier('pro')">
-      <div class="tier-name" style="color:var(--blue)">Pro</div>
-      <div class="tier-desc">Mid-sized vendor, regional</div>
-      <ul class="tier-features">
-        <li><span class="check">&#10003;</span> Baseline title</li>
-        <li><span class="check">&#10003;</span> Master category</li>
-        <li><span class="check">&#10003;</span> Brand</li>
-        <li><span class="check">&#10003;</span> Category guidelines</li>
-        <li><span class="check">&#10003;</span> Light variant pass</li>
-        <li><span class="cross">&#10005;</span> Premium model</li>
-      </ul>
-    </div>
-    <div class="tier-card tier-plus" onclick="selectTier('plus')">
-      <div class="tier-name" style="color:var(--purple)">Plus</div>
-      <div class="tier-desc">National vendor, meaningful GMV</div>
-      <ul class="tier-features">
-        <li><span class="check">&#10003;</span> Baseline title</li>
-        <li><span class="check">&#10003;</span> Master category</li>
-        <li><span class="check">&#10003;</span> Brand</li>
-        <li><span class="check">&#10003;</span> Granular guidelines</li>
-        <li><span class="check">&#10003;</span> Full variant + dedup</li>
-        <li><span class="check">&#10003;</span> Premium model</li>
-      </ul>
-    </div>
-    <div class="tier-card tier-enterprise" onclick="selectTier('enterprise')">
-      <div class="tier-name" style="color:var(--dh-red)">Enterprise</div>
-      <div class="tier-desc">Strategic partner (Carrefour-class)</div>
-      <ul class="tier-features">
-        <li><span class="check">&#10003;</span> Baseline title</li>
-        <li><span class="check">&#10003;</span> Master category</li>
-        <li><span class="check">&#10003;</span> Brand</li>
-        <li><span class="check">&#10003;</span> Full granular guidelines</li>
-        <li><span class="check">&#10003;</span> Full variant + dedup</li>
-        <li><span class="check">&#10003;</span> Best-available model</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Product being processed -->
-  <div id="pipelineDemo" style="display:none;">
-    <h2>2. Product Flowing Through the Pipeline</h2>
-    <div class="product-card-demo" id="productCard">
-      <div class="flex items-center justify-between mb-1">
-        <div>
-          <span class="badge" id="productTierBadge">LITE</span>
-          <span class="text-xs text-muted" style="margin-left:0.5rem;">SKU-4829371</span>
-        </div>
-        <span class="text-xs text-muted" id="productVendor">Vendor: Al-Maha Market</span>
-      </div>
-      <div class="product-title" id="productTitle">Almarai Full Fat Milk 1L</div>
-      <div class="product-attrs" id="productAttrs">
-        <!-- filled dynamically -->
-      </div>
-    </div>
-
-    <!-- Pipeline stages -->
-    <div class="pipeline" id="pipelineStages">
-      <div class="pipeline-stage" id="ps-1">
-        <div class="stage-num">Stage 1</div>
-        <div class="stage-title">Tier Assignment</div>
-        <div class="stage-detail" id="ps-1-detail">Vendor tier determines investment depth</div>
-      </div>
-      <div class="pipeline-arrow">&#8594;</div>
-      <div class="pipeline-stage" id="ps-2">
-        <div class="stage-num">Stage 2</div>
-        <div class="stage-title">ROI Check</div>
-        <div class="stage-detail" id="ps-2-detail">Expected return assessed</div>
-      </div>
-      <div class="pipeline-arrow">&#8594;</div>
-      <div class="pipeline-stage" id="ps-3">
-        <div class="stage-num">Stage 3</div>
-        <div class="stage-title">Model Selection</div>
-        <div class="stage-detail" id="ps-3-detail">Best model for tier + task</div>
-      </div>
-      <div class="pipeline-arrow">&#8594;</div>
-      <div class="pipeline-stage" id="ps-4">
-        <div class="stage-num">Stage 4</div>
-        <div class="stage-title">Content Generation</div>
-        <div class="stage-detail" id="ps-4-detail">Title, attributes, enrichment</div>
-      </div>
-      <div class="pipeline-arrow">&#8594;</div>
-      <div class="pipeline-stage" id="ps-5">
-        <div class="stage-num">Stage 5</div>
-        <div class="stage-title">Inline QA</div>
-        <div class="stage-detail" id="ps-5-detail">Validated against acceptance criteria</div>
-      </div>
-      <div class="pipeline-arrow">&#8594;</div>
-      <div class="pipeline-stage" id="ps-6">
-        <div class="stage-num">Stage 6</div>
-        <div class="stage-title">Publish</div>
-        <div class="stage-detail" id="ps-6-detail">Auto-publish or route for review</div>
-      </div>
-    </div>
-
-    <div class="flex gap-1 items-center" style="justify-content: center;">
-      <button class="btn btn-primary" id="runPipelineBtn" onclick="runPipeline()">Run Pipeline</button>
-      <button class="btn btn-secondary" onclick="resetPipeline()">Reset</button>
-    </div>
-
-    <!-- Output comparison -->
-    <div id="pipelineResult" class="mt-2" style="display:none;">
-      <h2>3. Output Comparison</h2>
-      <div class="comparison">
-        <div class="card">
-          <h3><span class="status-dot red"></span> Before (Open Loop)</h3>
-          <div class="mt-1">
-            <p class="text-sm"><strong>Title:</strong> <span id="beforeTitle" class="font-mono text-muted"></span></p>
-            <p class="text-sm mt-1"><strong>Attributes:</strong></p>
-            <div id="beforeAttrs" class="product-attrs mt-1"></div>
-            <p class="text-sm text-muted mt-1" id="beforeNote"></p>
-          </div>
-        </div>
-        <div class="comparison-arrow">&#8594;</div>
-        <div class="card">
-          <h3><span class="status-dot green"></span> After (Closed Loop)</h3>
-          <div class="mt-1">
-            <p class="text-sm"><strong>Title:</strong> <span id="afterTitle" class="font-mono" style="color:var(--green)"></span></p>
-            <p class="text-sm mt-1"><strong>Attributes:</strong></p>
-            <div id="afterAttrs" class="product-attrs mt-1"></div>
-            <p class="text-sm mt-1" id="afterNote" style="color:var(--green)"></p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Cost/Quality/Speed metrics -->
-      <div class="grid-3 mt-1">
-        <div class="metric-box">
-          <div class="value" id="metricQuality" style="color:var(--green)">--</div>
-          <div class="label">Quality Score</div>
-          <div class="delta delta-up" id="metricQualityDelta"></div>
-        </div>
-        <div class="metric-box">
-          <div class="value" id="metricCost" style="color:var(--cyan)">--</div>
-          <div class="label">Cost per Product</div>
-          <div class="delta" id="metricCostDelta"></div>
-        </div>
-        <div class="metric-box">
-          <div class="value" id="metricSpeed" style="color:var(--purple)">--</div>
-          <div class="label">Time to Shelf</div>
-          <div class="delta delta-up" id="metricSpeedDelta"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ======================== MODEL STORE ======================== -->
-<section id="modelstore">
-  <h1>Model Store & Selection Agent</h1>
-  <p class="subtitle">One registry of every LLM available. The selection agent continuously benchmarks and assigns the right model to each task and tier.</p>
-
-  <div class="grid-2 gap-2">
-    <!-- Model Registry -->
-    <div>
-      <h2>Model Registry</h2>
-      <div class="card" style="padding:0; overflow:hidden;">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Model</th>
-              <th>Type</th>
-              <th>Cost</th>
-              <th>Latency</th>
-              <th>Quality</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="model-winner">
-              <td><strong>GPT-4.1-mini</strong></td>
-              <td><span class="badge badge-blue">External</span></td>
-              <td class="text-green">$0.003</td>
-              <td>420ms</td>
-              <td>
-                <div class="progress-bar" style="width:80px;display:inline-block;">
-                  <div class="fill" style="width:72%;background:var(--green);"></div>
-                </div>
-                <span class="text-xs text-muted">72%</span>
-              </td>
-            </tr>
-            <tr>
-              <td><strong>Claude 4 Haiku</strong></td>
-              <td><span class="badge badge-blue">External</span></td>
-              <td>$0.005</td>
-              <td>380ms</td>
-              <td>
-                <div class="progress-bar" style="width:80px;display:inline-block;">
-                  <div class="fill" style="width:78%;background:var(--green);"></div>
-                </div>
-                <span class="text-xs text-muted">78%</span>
-              </td>
-            </tr>
-            <tr>
-              <td><strong>Gemini 2.5 Flash</strong></td>
-              <td><span class="badge badge-blue">External</span></td>
-              <td class="text-green">$0.002</td>
-              <td>350ms</td>
-              <td>
-                <div class="progress-bar" style="width:80px;display:inline-block;">
-                  <div class="fill" style="width:68%;background:var(--amber);"></div>
-                </div>
-                <span class="text-xs text-muted">68%</span>
-              </td>
-            </tr>
-            <tr class="model-winner">
-              <td><strong>Claude 4 Sonnet</strong></td>
-              <td><span class="badge badge-blue">External</span></td>
-              <td>$0.015</td>
-              <td>620ms</td>
-              <td>
-                <div class="progress-bar" style="width:80px;display:inline-block;">
-                  <div class="fill" style="width:91%;background:var(--green);"></div>
-                </div>
-                <span class="text-xs text-muted">91%</span>
-              </td>
-            </tr>
-            <tr>
-              <td><strong>DH-Title-v3</strong></td>
-              <td><span class="badge badge-purple">Fine-tuned</span></td>
-              <td class="text-green">$0.001</td>
-              <td>180ms</td>
-              <td>
-                <div class="progress-bar" style="width:80px;display:inline-block;">
-                  <div class="fill" style="width:65%;background:var(--amber);"></div>
-                </div>
-                <span class="text-xs text-muted">65%</span>
-              </td>
-            </tr>
-            <tr>
-              <td><strong>GPT-4.1</strong></td>
-              <td><span class="badge badge-blue">External</span></td>
-              <td>$0.030</td>
-              <td>890ms</td>
-              <td>
-                <div class="progress-bar" style="width:80px;display:inline-block;">
-                  <div class="fill" style="width:94%;background:var(--green);"></div>
-                </div>
-                <span class="text-xs text-muted">94%</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="text-xs text-muted mt-1"><span class="status-dot green"></span>Green rows = currently assigned to a task+tier</p>
-    </div>
-
-    <!-- Assignment Matrix -->
-    <div>
-      <h2>Task x Tier Assignment</h2>
-      <div class="card" style="padding:0; overflow:hidden;">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Task</th>
-              <th>Lite</th>
-              <th>Pro</th>
-              <th>Plus</th>
-              <th>Enterprise</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Title Generation</strong></td>
-              <td><span class="text-xs" style="color:var(--gray)">DH-Title-v3</span></td>
-              <td><span class="text-xs" style="color:var(--blue)">GPT-4.1-mini</span></td>
-              <td><span class="text-xs" style="color:var(--purple)">Claude 4 Sonnet</span></td>
-              <td><span class="text-xs" style="color:var(--dh-red)">GPT-4.1</span></td>
-            </tr>
-            <tr>
-              <td><strong>Category Mapping</strong></td>
-              <td><span class="text-xs" style="color:var(--gray)">DH-Title-v3</span></td>
-              <td><span class="text-xs" style="color:var(--blue)">DH-Title-v3</span></td>
-              <td><span class="text-xs" style="color:var(--purple)">GPT-4.1-mini</span></td>
-              <td><span class="text-xs" style="color:var(--dh-red)">Claude 4 Sonnet</span></td>
-            </tr>
-            <tr>
-              <td><strong>Attribute Extraction</strong></td>
-              <td><span class="text-xs" style="color:var(--gray)">-</span></td>
-              <td><span class="text-xs" style="color:var(--blue)">Gemini 2.5 Flash</span></td>
-              <td><span class="text-xs" style="color:var(--purple)">Claude 4 Sonnet</span></td>
-              <td><span class="text-xs" style="color:var(--dh-red)">GPT-4.1</span></td>
-            </tr>
-            <tr>
-              <td><strong>Variant Grouping</strong></td>
-              <td><span class="text-xs" style="color:var(--gray)">-</span></td>
-              <td><span class="text-xs" style="color:var(--blue)">GPT-4.1-mini</span></td>
-              <td><span class="text-xs" style="color:var(--purple)">Claude 4 Sonnet</span></td>
-              <td><span class="text-xs" style="color:var(--dh-red)">GPT-4.1</span></td>
-            </tr>
-            <tr>
-              <td><strong>Image QA</strong></td>
-              <td><span class="text-xs" style="color:var(--gray)">-</span></td>
-              <td><span class="text-xs" style="color:var(--blue)">-</span></td>
-              <td><span class="text-xs" style="color:var(--purple)">GPT-4.1-mini</span></td>
-              <td><span class="text-xs" style="color:var(--dh-red)">Claude 4 Sonnet</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h2 class="mt-2">Selection Agent Activity</h2>
-      <div class="card">
-        <div class="flex flex-col gap-1">
-          <div class="flex items-center gap-1">
-            <span class="status-dot green"></span>
-            <span class="text-sm"><strong>Claude 4 Sonnet</strong> assigned to Plus Title Gen</span>
-            <span class="text-xs text-muted" style="margin-left:auto;">2 min ago</span>
-          </div>
-          <div class="flex items-center gap-1">
-            <span class="status-dot amber"></span>
-            <span class="text-sm"><strong>Gemini 2.5 Flash</strong> benchmarking for Lite titles</span>
-            <span class="text-xs text-muted" style="margin-left:auto;">14 min ago</span>
-          </div>
-          <div class="flex items-center gap-1">
-            <span class="status-dot green"></span>
-            <span class="text-sm"><strong>GPT-4.1-mini</strong> passed acceptance for Pro attributes</span>
-            <span class="text-xs text-muted" style="margin-left:auto;">1 hr ago</span>
-          </div>
-          <div class="flex items-center gap-1">
-            <span class="status-dot red"></span>
-            <span class="text-sm"><strong>DH-Title-v3</strong> regressed on APAC titles (-4.2%)</span>
-            <span class="text-xs text-muted" style="margin-left:auto;">3 hr ago</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Model comparison simulator -->
-  <h2 class="mt-2">Benchmark Comparison</h2>
-  <p class="text-sm text-muted mb-1">The selection agent runs this automatically on every new model. Select a task to see how models compare.</p>
-  <div class="btn-group mb-2">
-    <button class="btn btn-sm btn-primary" onclick="showBenchmark('title')">Title Generation</button>
-    <button class="btn btn-sm btn-secondary" onclick="showBenchmark('category')">Category Mapping</button>
-    <button class="btn btn-sm btn-secondary" onclick="showBenchmark('attributes')">Attribute Extraction</button>
-  </div>
-  <div class="card" id="benchmarkChart">
-    <div class="grid-2 gap-2">
-      <div>
-        <h3 class="mb-1">Quality vs Cost (Title Generation)</h3>
-        <div id="scatterPlot" style="position:relative;height:300px;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:rgba(0,0,0,0.2);">
-          <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:0.7rem;color:var(--text-muted);">Cost per 1K products &#8594;</div>
-          <div style="position:absolute;left:10px;top:50%;transform:translateY(-50%) rotate(-90deg);font-size:0.7rem;color:var(--text-muted);">Quality Score &#8594;</div>
-          <!-- Model dots -->
-          <div style="position:absolute;bottom:35%;left:10%;width:36px;height:36px;border-radius:50%;background:rgba(148,163,184,0.3);border:2px solid var(--gray);display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;cursor:pointer;" title="DH-Title-v3: 65%, $1">v3</div>
-          <div style="position:absolute;bottom:50%;left:25%;width:36px;height:36px;border-radius:50%;background:rgba(6,182,212,0.3);border:2px solid var(--cyan);display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;cursor:pointer;" title="Gemini Flash: 68%, $2">GF</div>
-          <div style="position:absolute;bottom:60%;left:35%;width:36px;height:36px;border-radius:50%;background:rgba(59,130,246,0.3);border:2px solid var(--blue);display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;cursor:pointer;" title="GPT-4.1-mini: 72%, $3">4m</div>
-          <div style="position:absolute;bottom:68%;left:42%;width:36px;height:36px;border-radius:50%;background:rgba(16,185,129,0.3);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;cursor:pointer;" title="Claude Haiku: 78%, $5">CH</div>
-          <div style="position:absolute;bottom:82%;left:62%;width:40px;height:40px;border-radius:50%;background:rgba(139,92,246,0.3);border:2px solid var(--purple);display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;cursor:pointer;" title="Claude Sonnet: 91%, $15">CS</div>
-          <div style="position:absolute;bottom:88%;left:82%;width:40px;height:40px;border-radius:50%;background:rgba(212,33,61,0.3);border:2px solid var(--dh-red);display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;cursor:pointer;" title="GPT-4.1: 94%, $30">4.1</div>
-          <!-- Tier zones -->
-          <div style="position:absolute;bottom:0;left:0;width:30%;height:100%;background:rgba(148,163,184,0.03);border-right:1px dashed rgba(148,163,184,0.15);display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;font-size:0.6rem;color:var(--gray);">Lite zone</div>
-          <div style="position:absolute;bottom:0;left:30%;width:25%;height:100%;background:rgba(59,130,246,0.03);border-right:1px dashed rgba(59,130,246,0.15);display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;font-size:0.6rem;color:var(--blue);">Pro zone</div>
-          <div style="position:absolute;bottom:0;left:55%;width:25%;height:100%;background:rgba(139,92,246,0.03);border-right:1px dashed rgba(139,92,246,0.15);display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;font-size:0.6rem;color:var(--purple);">Plus zone</div>
-          <div style="position:absolute;bottom:0;left:80%;width:20%;height:100%;background:rgba(212,33,61,0.03);display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;font-size:0.6rem;color:var(--dh-red);">Enterprise</div>
-        </div>
-      </div>
-      <div>
-        <h3 class="mb-1">Selection Logic</h3>
-        <div class="flex flex-col gap-1">
-          <div class="card" style="padding:1rem;border-left:3px solid var(--gray);">
-            <p class="text-xs" style="color:var(--gray);font-weight:600;">LITE + PRO</p>
-            <p class="text-sm">Minimize cost subject to clearing the acceptance bar and latency SLA</p>
-          </div>
-          <div class="card" style="padding:1rem;border-left:3px solid var(--purple);">
-            <p class="text-xs" style="color:var(--purple);font-weight:600;">PLUS + ENTERPRISE</p>
-            <p class="text-sm">Maximize accuracy subject to the latency SLA</p>
-          </div>
-          <div class="card" style="padding:1rem;border-left:3px solid var(--green);">
-            <p class="text-xs" style="color:var(--green);font-weight:600;">SAFE SWITCHING</p>
-            <p class="text-sm">Shadow-test against production, gradual rollout, auto-rollback on regression</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ======================== QA MONITOR ======================== -->
-<section id="qa">
-  <h1>QA Monitor & Improvement Loop</h1>
-  <p class="subtitle">Continuous quality monitoring with automated detection, diagnosis, and resolution. Watch Herogen fix problems in real time.</p>
-
-  <div class="grid-2 gap-2">
-    <!-- Live QA Feed -->
-    <div>
-      <h2>
-        <span class="status-dot green"></span>
-        Live Quality Feed
-      </h2>
-      <div class="qa-feed" id="qaFeed">
-        <!-- populated by JS -->
-      </div>
-      <button class="btn btn-sm btn-secondary mt-1" onclick="addQaEvent()">Simulate Event</button>
-    </div>
-
-    <!-- Herogen Loop -->
-    <div>
-      <h2>Herogen Improvement Loop</h2>
-      <div id="herogenDemo">
-        <div class="card mb-1" style="border-left:3px solid var(--amber);">
-          <div class="flex items-center justify-between">
-            <h3 style="margin:0;">Active Issue</h3>
-            <span class="badge badge-amber">In Progress</span>
-          </div>
-          <p class="text-sm text-muted mt-1"><strong>Pattern detected:</strong> "add 1 Piece" appended to 28% of dairy titles in MENA region</p>
-          <div class="mt-1" id="herogenSteps">
-            <div class="flex items-center gap-1 text-sm" style="padding:0.3rem 0;">
-              <span style="color:var(--green);">&#10003;</span>
-              <span><strong>Detect:</strong> Monitoring QA flagged pattern across 14,200 products</span>
-            </div>
-            <div class="flex items-center gap-1 text-sm" style="padding:0.3rem 0;">
-              <span style="color:var(--green);">&#10003;</span>
-              <span><strong>Diagnose:</strong> Post-processing rule gap. Unit info missing from source data.</span>
-            </div>
-            <div class="flex items-center gap-1 text-sm" style="padding:0.3rem 0;">
-              <span style="color:var(--green);">&#10003;</span>
-              <span><strong>Propose:</strong> Add post-processing rule: if item_count=1 AND unit=piece, append "1 Piece"</span>
-            </div>
-            <div class="flex items-center gap-1 text-sm" style="padding:0.3rem 0;">
-              <span style="color:var(--green);">&#10003;</span>
-              <span><strong>Risk-assess:</strong> Low blast radius. No dependent system affected. Minor UX change.</span>
-            </div>
-            <div class="flex items-center gap-1 text-sm" style="padding:0.3rem 0;color:var(--amber);">
-              <span>&#9679;</span>
-              <span><strong>Route:</strong> Auto-implement. Shadow testing against 500 products...</span>
-            </div>
-            <div class="flex items-center gap-1 text-sm" style="padding:0.3rem 0;opacity:0.4;">
-              <span>&#9675;</span>
-              <span><strong>Verify:</strong> Pending deployment</span>
-            </div>
-          </div>
-          <div class="mt-1">
-            <div class="progress-bar">
-              <div class="fill" style="width:72%;background:linear-gradient(90deg, var(--green), var(--amber));"></div>
-            </div>
-            <p class="text-xs text-muted mt-1">Shadow test: 486/500 products processed, 98.1% pass rate</p>
-          </div>
-        </div>
-
-        <!-- Routing decision -->
-        <div class="card">
-          <h3 class="mb-1">Routing Decision Matrix</h3>
-          <table class="data-table" style="font-size:0.8rem;">
-            <thead>
-              <tr><th>Condition</th><th>Route</th><th>Example</th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><span class="badge badge-green">Low risk</span></td>
-                <td>Herogen auto-deploys</td>
-                <td>"add 1 Piece" rule</td>
-              </tr>
-              <tr>
-                <td><span class="badge badge-amber">Medium risk</span></td>
-                <td>Escalate to PM</td>
-                <td>Title structure change</td>
-              </tr>
-              <tr>
-                <td><span class="badge badge-red">High risk</span></td>
-                <td>Human-led work</td>
-                <td>Category remap</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Quality Dashboard -->
-  <h2 class="mt-2">Quality Dashboard (Simulated)</h2>
-  <div class="grid-4 mb-1">
-    <div class="metric-box">
-      <div class="value text-green" id="qaMetric1">94.2%</div>
-      <div class="label">Inline QA Pass Rate</div>
-      <div class="delta delta-up">+27.6% from baseline</div>
-    </div>
-    <div class="metric-box">
-      <div class="value text-green" id="qaMetric2">12</div>
-      <div class="label">Auto-fixed (7d)</div>
-      <div class="delta delta-up">previously: 0</div>
-    </div>
-    <div class="metric-box">
-      <div class="value text-amber" id="qaMetric3">3</div>
-      <div class="label">Escalated to PM</div>
-      <div class="delta">with diagnosis attached</div>
-    </div>
-    <div class="metric-box">
-      <div class="value text-cyan" id="qaMetric4">2.1 days</div>
-      <div class="label">Avg. Resolution Time</div>
-      <div class="delta delta-up">down from ~90 days</div>
-    </div>
-  </div>
-
-  <!-- Before/After -->
-  <div class="grid-2 gap-2">
-    <div class="card">
-      <h3 class="mb-1" style="display:flex;align-items:center;gap:0.5rem;"><span class="status-dot red"></span> Before: Open Loop</h3>
-      <ul class="text-sm text-muted" style="list-style:none;display:flex;flex-direction:column;gap:0.5rem;">
-        <li>Problem detected via correction data, weeks later</li>
-        <li>Fix requires a development cycle</li>
-        <li>Minor issues never prioritised</li>
-        <li>No auto-publish capability</li>
-        <li>Quality judged case by case</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h3 class="mb-1" style="display:flex;align-items:center;gap:0.5rem;"><span class="status-dot green"></span> After: Closed Loop</h3>
-      <ul class="text-sm" style="list-style:none;display:flex;flex-direction:column;gap:0.5rem;color:var(--green);">
-        <li>Problems detected in real time by QA agents</li>
-        <li>Low-risk fixes auto-deployed in days</li>
-        <li>Minor improvements ship continuously</li>
-        <li>Auto-publish with threshold-based gate</li>
-        <li>Quality checked against written criteria</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<!-- ======================== ROADMAP ======================== -->
-<section id="roadmap">
-  <h1>Roadmap & Sequencing</h1>
-  <p class="subtitle">Pillars are sequenced by dependency. Each phase builds on the last. A reliable baseline must precede tiering; acceptance criteria must precede model selection.</p>
-
-  <div class="grid-2 gap-2">
-    <div>
-      <div class="roadmap-track">
-        <div class="roadmap-phase">
-          <div class="phase-tag" style="color:var(--dh-red);">Phase 0 &mdash; Foundations</div>
-          <h3>The Floor</h3>
-          <p class="text-sm text-muted">Define acceptance criteria and the health standard. Fix the critical model gaps: auto-publish threshold, APAC format, Spanish extraction, attribute storage, the "add 1 Piece" rule. Stand up the correction-pair dataset.</p>
-          <div class="roadmap-pillars">
-            <span class="badge badge-green">Pillar 3</span>
-            <span class="badge badge-purple">Pillar 4 start</span>
-            <span class="badge badge-red">Pillar 6 start</span>
-          </div>
-        </div>
-        <div class="roadmap-phase">
-          <div class="phase-tag" style="color:var(--purple);">Phase 1 &mdash; Differentiated Investment</div>
-          <h3>Tiering + Guidelines + Model Store MVP</h3>
-          <p class="text-sm text-muted">Tiering live. Granular guidelines for top categories and experimentation capability. Model Store MVP: access layer and registry with assisted selection. Inline QA gate live.</p>
-          <div class="roadmap-pillars">
-            <span class="badge badge-blue">Pillar 1</span>
-            <span class="badge badge-purple">Pillar 4</span>
-            <span class="badge badge-cyan">Pillar 5 MVP</span>
-            <span class="badge badge-red">Pillar 6 inline</span>
-          </div>
-        </div>
-        <div class="roadmap-phase">
-          <div class="phase-tag" style="color:var(--blue);">Phase 2 &mdash; Intelligence</div>
-          <h3>ROI + Autonomous Model Selection + Monitoring</h3>
-          <p class="text-sm text-muted">ROI override live. Model Selection Agent running autonomously. Monitoring QA agents in detect-and-report mode.</p>
-          <div class="roadmap-pillars">
-            <span class="badge badge-blue">Pillar 2</span>
-            <span class="badge badge-cyan">Pillar 5 auto</span>
-            <span class="badge badge-red">Pillar 6 monitor</span>
-          </div>
-        </div>
-        <div class="roadmap-phase">
-          <div class="phase-tag" style="color:var(--green);">Phase 3 &mdash; Closed Loop</div>
-          <h3>Herogen + Self-tuning</h3>
-          <p class="text-sm text-muted">Herogen automated improvement with risk-based autonomy. Self-tuning model assignment, guidelines, and ROI estimates across the catalog.</p>
-          <div class="roadmap-pillars">
-            <span class="badge badge-red">Pillar 6 full</span>
-            <span class="badge badge-green">Self-learning</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Dependencies + summary -->
-    <div>
-      <h2>Critical Dependencies</h2>
-      <div class="card mb-2">
-        <div class="flex flex-col gap-1">
-          <div class="flex items-center gap-1 text-sm">
-            <span style="color:var(--dh-red);">&#9656;</span>
-            <span>Reliable baseline (Phase 0) <strong>must precede</strong> tiering</span>
-          </div>
-          <div class="flex items-center gap-1 text-sm">
-            <span style="color:var(--purple);">&#9656;</span>
-            <span>Acceptance criteria (Pillar 4) <strong>must precede</strong> Model Selection Agent</span>
-          </div>
-          <div class="flex items-center gap-1 text-sm">
-            <span style="color:var(--blue);">&#9656;</span>
-            <span>Inline QA <strong>must precede</strong> monitoring QA</span>
-          </div>
-          <div class="flex items-center gap-1 text-sm">
-            <span style="color:var(--green);">&#9656;</span>
-            <span>Monitoring QA <strong>must precede</strong> Herogen</span>
-          </div>
-          <div class="flex items-center gap-1 text-sm">
-            <span style="color:var(--cyan);">&#9656;</span>
-            <span>Experimentation capability needed before guideline tuning</span>
-          </div>
-        </div>
-      </div>
-
-      <h2>The Win, Stated Plainly</h2>
-      <div class="card">
-        <table class="data-table" style="font-size:0.8rem;">
-          <thead>
-            <tr><th>Goal</th><th>Today</th><th>Target</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Quality</strong></td>
-              <td class="text-red">~66.6% corrected</td>
-              <td class="text-green">Corrections are the exception</td>
-            </tr>
-            <tr>
-              <td><strong>Cost</strong></td>
-              <td class="text-red">Uniform spend</td>
-              <td class="text-green">Scales with value</td>
-            </tr>
-            <tr>
-              <td><strong>Speed</strong></td>
-              <td class="text-red">Months to react</td>
-              <td class="text-green">Days; minor fixes continuous</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h2 class="mt-2">Key Assumptions</h2>
-      <div class="card">
-        <div class="flex flex-col gap-1 text-sm text-muted">
-          <div>&#8226; Vendor tier can be operationally defined with Commercial within a quarter</div>
-          <div>&#8226; Per-product cost attribution becomes possible</div>
-          <div>&#8226; A model gateway (LiteLLM or equivalent) is available and compliant</div>
-          <div>&#8226; An AI development agent (Herogen) can be adopted</div>
-          <div>&#8226; Experimentation capability can be built in Phase 1</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<script>
-// NAVIGATION
-function showSection(id) {
-  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
-  event.target.classList.add('active');
-  window.scrollTo(0, 0);
+function initialsOf(name) {
+  return name.split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
 }
 
-// LOOP DIAGRAM
-const loopDescriptions = {
-  budget: 'Pillar 1 (Tiered Onboarding) + Pillar 2 (ROI Override): Vendor tier sets the investment envelope before any content work begins. The ROI override refines it per product.',
-  target: 'Pillar 4 (Guidelines & Acceptance Criteria): Guidelines and acceptance criteria define what good means before generation runs. The target is defined, not discovered.',
-  model: 'Pillar 5 (Model Store & Selection Agent): The Model Selection Agent assigns the most cost-effective model that clears the bar for each task and tier. Continuously.',
-  qa: 'Pillar 6 (Inline QA): Every generation is validated against the acceptance criteria before publishing. Outputs that clear the bar auto-publish; others are flagged.',
-  monitor: 'Pillar 6 (Monitoring QA): Agents continuously scan production output, correction signals, and downstream metrics to detect patterns, failures, regressions, and drift.',
-  fix: 'Pillar 6 (Herogen): Low-risk issues are fixed automatically. High-risk issues are escalated with a diagnosis already attached. The gap between detection and resolution shrinks to days.',
-  learn: 'The Feedback Loop: Correction data, model performance, and detected patterns update guidelines, acceptance criteria, model assignments, and ROI estimates. Each cycle tightens the next.'
+function Avatar({ name, tint, edge, accent, size = 96 }) {
+  // Circular avatar with brand-tinted gradient bg + initials.
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: "50%",
+      background: `radial-gradient(ellipse at 30% 30%, var(--surface) 0%, ${tint} 70%)`,
+      border: `1px solid ${edge}`,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      position: "relative", overflow: "hidden",
+      boxShadow: "var(--shadow-1)",
+    }}>
+      <span style={{
+        fontFamily: "var(--font)", fontWeight: 700,
+        fontSize: size * 0.32, color: accent,
+        letterSpacing: "-0.02em",
+      }}>{initialsOf(name)}</span>
+      {/* subtle ring */}
+      <div style={{
+        position: "absolute", inset: 4,
+        borderRadius: "50%", border: `1px dashed ${edge}`, opacity: 0.5,
+      }}/>
+    </div>
+  );
+}
+
+function Hero() {
+  return (
+    <section style={{
+      padding: "92px 28px 72px",
+      maxWidth: 1200, margin: "0 auto",
+      textAlign: "center",
+    }}>
+      <div className="fade-up" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", border: "1px solid var(--border)", background: "var(--surface)", borderRadius: 999, boxShadow: "var(--shadow-1)", marginBottom: 28 }}>
+        <span style={{ width: 8, height: 8, background: "var(--green)", borderRadius: "50%", animation: "drift 1.8s ease-in-out infinite" }}/>
+        <span style={{ fontSize: 12.5, color: "var(--ink-soft)", fontWeight: 500 }}>Internal · Delivery Hero · Q-Commerce</span>
+      </div>
+
+      <div className="fade-up" style={{ display: "flex", justifyContent: "center", marginBottom: 14, animationDelay: "60ms" }}>
+        <DCMark size={88}/>
+      </div>
+
+      <h1 className="fade-up" style={{
+        margin: 0, fontFamily: "var(--font)", fontWeight: 800,
+        fontSize: "clamp(56px, 8vw, 104px)", lineHeight: 1.0,
+        letterSpacing: "-0.04em", color: "var(--ink)", textWrap: "balance",
+        animationDelay: "120ms",
+      }}>
+        Dynamic <span style={{ color: "var(--dh-red)" }}>Content</span>
+      </h1>
+
+      <p className="fade-up" style={{
+        marginTop: 22, fontSize: 22, lineHeight: 1.45,
+        color: "var(--ink-soft)", maxWidth: 720,
+        marginLeft: "auto", marginRight: "auto", fontWeight: 400,
+        textWrap: "pretty",
+        animationDelay: "180ms",
+      }}>
+        Closed-loop content intelligence for Q-Commerce. One Model Store, one QA framework, one feedback signal — applied to every title, attribute, and category we generate.
+      </p>
+
+      <div className="fade-up" style={{ marginTop: 36, display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap", animationDelay: "240ms" }}>
+        <a href="Walkthrough.html" style={ctaPrimary}>
+          View Strategy
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </a>
+        <a href="Demo.html" style={ctaSecondary}>
+          Watch Demo
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+        </a>
+      </div>
+
+      <div className="fade-up" style={{ marginTop: 56, display: "inline-flex", flexWrap: "wrap", gap: 28, justifyContent: "center", animationDelay: "320ms" }}>
+        {[
+          { v: "2", l: "AI systems unified" },
+          { v: "10", l: "problems closed out" },
+          { v: "4", l: "investment tiers" },
+          { v: "3", l: "platforms · 70+ countries" },
+        ].map((s, i) => (
+          <div key={i} style={{ textAlign: "left", padding: "4px 14px", borderLeft: i === 0 ? "none" : "1px solid var(--border)" }}>
+            <div style={{ fontWeight: 700, fontSize: 28, color: "var(--ink)", letterSpacing: "-0.02em" }}>{s.v}</div>
+            <div style={{ fontSize: 12, color: "var(--ink-mute)", marginTop: 2 }}>{s.l}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+const ctaPrimary = {
+  display: "inline-flex", alignItems: "center", gap: 8,
+  padding: "13px 22px",
+  background: "var(--ink)", color: "#fff",
+  border: "1px solid var(--ink)",
+  borderRadius: 999,
+  fontFamily: "var(--font)", fontWeight: 600, fontSize: 15,
+  textDecoration: "none",
+  boxShadow: "var(--shadow-2)",
+  transition: "transform 140ms ease, box-shadow 140ms ease",
+};
+const ctaSecondary = {
+  ...ctaPrimary,
+  background: "var(--surface)", color: "var(--ink)",
+  border: "1px solid var(--border-strong)",
+  boxShadow: "var(--shadow-1)",
 };
 
-function highlightNode(id) {
-  document.querySelectorAll('.loop-node').forEach(n => n.classList.remove('active'));
-  document.getElementById('ln-' + id).classList.add('active');
-  document.getElementById('loopDetail').style.display = 'block';
-  document.getElementById('loopDetailText').textContent = loopDescriptions[id];
-}
-
-// Draw loop arrows
-function drawLoopArrows() {
-  const svg = document.getElementById('loopSvg');
-  const container = document.getElementById('loopDiagram');
-  const w = container.offsetWidth;
-  const h = container.offsetHeight;
-  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
-
-  const nodes = ['budget','target','model','qa','monitor','fix','learn'];
-  const centers = nodes.map(id => {
-    const el = document.getElementById('ln-' + id);
-    return {
-      x: el.offsetLeft + el.offsetWidth / 2,
-      y: el.offsetTop + el.offsetHeight / 2
-    };
-  });
-
-  let paths = '';
-  for (let i = 0; i < centers.length; i++) {
-    const from = centers[i];
-    const to = centers[(i + 1) % centers.length];
-    paths += `<line x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}"
-      stroke="rgba(212,33,61,0.3)" stroke-width="2" stroke-dasharray="6,4"/>`;
-  }
-  svg.innerHTML = paths;
-}
-
-// Auto-animate loop
-let loopIndex = 0;
-const loopNodeIds = ['budget','target','model','qa','monitor','fix','learn'];
-function animateLoop() {
-  highlightNode(loopNodeIds[loopIndex]);
-  loopIndex = (loopIndex + 1) % loopNodeIds.length;
-}
-
-// TIER SELECTION
-let selectedTier = null;
-const tierData = {
-  lite: {
-    badge: 'LITE', badgeClass: 'badge-blue', color: 'var(--gray)',
-    vendor: 'Vendor: Al-Maha Market (Local)',
-    model: 'DH-Title-v3 (fine-tuned, cheapest)',
-    roiDecision: 'No override. Low expected ROI.',
-    beforeTitle: 'almarai milk full fat 1L',
-    afterTitle: 'Almarai Full Fat Milk 1L',
-    beforeAttrs: [
-      {name:'Brand: Almarai', status:'filled'}, {name:'Category: Milk', status:'filled'},
-      {name:'Size: ?', status:'missing'}, {name:'Fat %: ?', status:'missing'},
-      {name:'Flavor: ?', status:'missing'}, {name:'Variant: ?', status:'missing'}
-    ],
-    afterAttrs: [
-      {name:'Brand: Almarai', status:'filled'}, {name:'Category: Milk', status:'filled'},
-      {name:'Size: 1L', status:'filled'}, {name:'Fat %: ?', status:'missing'},
-      {name:'Flavor: ?', status:'missing'}, {name:'Variant: ?', status:'missing'}
-    ],
-    beforeNote: 'No guidelines applied. No QA gate. Manually reviewed.',
-    afterNote: 'Baseline hygiene met. Auto-published. Cost: $0.001/product.',
-    quality: '72%', cost: '$0.001', speed: '< 1 min',
-    qualityDelta: 'clears hygiene bar', costDelta: 'cheapest tier', speedDelta: 'fully automated',
-  },
-  pro: {
-    badge: 'PRO', badgeClass: 'badge-blue', color: 'var(--blue)',
-    vendor: 'Vendor: FreshMart (Regional, 45 stores)',
-    model: 'GPT-4.1-mini (cost-optimized)',
-    roiDecision: 'Similar-product check: moderate expected return.',
-    beforeTitle: 'almarai milk full fat 1L',
-    afterTitle: 'Almarai Full Fat Milk 1L - Fresh Dairy',
-    beforeAttrs: [
-      {name:'Brand: Almarai', status:'filled'}, {name:'Category: Milk', status:'filled'},
-      {name:'Size: ?', status:'missing'}, {name:'Fat %: ?', status:'missing'},
-      {name:'Flavor: ?', status:'missing'}, {name:'Variant: ?', status:'missing'}
-    ],
-    afterAttrs: [
-      {name:'Brand: Almarai', status:'filled'}, {name:'Category: Milk', status:'filled'},
-      {name:'Size: 1L', status:'filled'}, {name:'Fat %: Full Fat', status:'enriched'},
-      {name:'Flavor: Plain', status:'enriched'}, {name:'Variant: grouped', status:'enriched'}
-    ],
-    beforeNote: 'No category guidelines. No variant pass.',
-    afterNote: 'Category-level guidelines applied. Light variant grouping. Cost: $0.003/product.',
-    quality: '82%', cost: '$0.003', speed: '< 2 min',
-    qualityDelta: 'category guidelines applied', costDelta: 'mid-tier model', speedDelta: 'automated + light review',
-  },
-  plus: {
-    badge: 'PLUS', badgeClass: 'badge-purple', color: 'var(--purple)',
-    vendor: 'Vendor: Carrefour Express (National, 280 stores)',
-    model: 'Claude 4 Sonnet (accuracy-optimized)',
-    roiDecision: 'High expected ROI. Top-selling category. Promoted from Pro.',
-    beforeTitle: 'almarai milk full fat 1L',
-    afterTitle: 'Almarai Full Fat Fresh Milk 1L - Long Life UHT',
-    beforeAttrs: [
-      {name:'Brand: Almarai', status:'filled'}, {name:'Category: Milk', status:'filled'},
-      {name:'Size: ?', status:'missing'}, {name:'Fat %: ?', status:'missing'},
-      {name:'Flavor: ?', status:'missing'}, {name:'Variant: ?', status:'missing'}
-    ],
-    afterAttrs: [
-      {name:'Brand: Almarai', status:'filled'}, {name:'Category: UHT Milk', status:'enriched'},
-      {name:'Size: 1L', status:'filled'}, {name:'Fat %: Full Fat (3.1%)', status:'enriched'},
-      {name:'Flavor: Plain', status:'enriched'}, {name:'Variant: 6-pack grouped', status:'enriched'},
-      {name:'Dietary: Gluten-free', status:'enriched'}, {name:'Origin: Saudi Arabia', status:'enriched'}
-    ],
-    beforeNote: 'No granular guidelines. No deep attributes. No dedup.',
-    afterNote: 'Granular guidelines. Full variant + dedup. Deep attributes. Cost: $0.015/product.',
-    quality: '91%', cost: '$0.015', speed: '< 3 min',
-    qualityDelta: 'conversion-ready', costDelta: 'premium model justified by GMV', speedDelta: 'automated + selective review',
-  },
-  enterprise: {
-    badge: 'ENTERPRISE', badgeClass: 'badge-red', color: 'var(--dh-red)',
-    vendor: 'Vendor: Carrefour Hypermarket (Strategic Partner)',
-    model: 'GPT-4.1 (best-available)',
-    roiDecision: 'Strategic partner override. Maximum investment.',
-    beforeTitle: 'almarai milk full fat 1L',
-    afterTitle: 'Almarai Full Fat Fresh Cow\'s Milk 1 Litre - UHT Long Life, No Preservatives',
-    beforeAttrs: [
-      {name:'Brand: Almarai', status:'filled'}, {name:'Category: Milk', status:'filled'},
-      {name:'Size: ?', status:'missing'}, {name:'Fat %: ?', status:'missing'},
-      {name:'Flavor: ?', status:'missing'}, {name:'Variant: ?', status:'missing'}
-    ],
-    afterAttrs: [
-      {name:'Brand: Almarai', status:'filled'}, {name:'Category: UHT Milk', status:'enriched'},
-      {name:'Size: 1 Litre', status:'filled'}, {name:'Fat %: Full Fat (3.1%)', status:'enriched'},
-      {name:'Flavor: Plain', status:'enriched'}, {name:'Variant: 1L/2L/500ml grouped', status:'enriched'},
-      {name:'Dietary: Gluten-free', status:'enriched'}, {name:'Origin: Saudi Arabia', status:'enriched'},
-      {name:'Storage: Room Temp', status:'enriched'}, {name:'Shelf Life: 6 months', status:'enriched'},
-      {name:'Trust Badge: Verified', status:'enriched'}
-    ],
-    beforeNote: 'Same treatment as every other product. No partner-level quality.',
-    afterNote: 'Best model. Full guidelines. Trust-class validation. Matches partner standards. Cost: $0.030/product.',
-    quality: '94%', cost: '$0.030', speed: '< 5 min',
-    qualityDelta: 'matches partner listing quality', costDelta: 'best-available, justified by strategic value', speedDelta: 'automated + trust-class validation',
-  }
-};
-
-function selectTier(tier) {
-  selectedTier = tier;
-  document.querySelectorAll('.tier-card').forEach(c => c.classList.remove('selected'));
-  document.querySelector('.tier-' + tier).classList.add('selected');
-  document.getElementById('pipelineDemo').style.display = 'block';
-  document.getElementById('pipelineResult').style.display = 'none';
-  resetPipeline();
-
-  const d = tierData[tier];
-  document.getElementById('productTierBadge').textContent = d.badge;
-  document.getElementById('productTierBadge').className = 'badge ' + d.badgeClass;
-  document.getElementById('productVendor').textContent = d.vendor;
-
-  const attrsHtml = d.beforeAttrs.map(a =>
-    `<span class="attr-tag ${a.status}">${a.name}</span>`
-  ).join('');
-  document.getElementById('productAttrs').innerHTML = attrsHtml;
-}
-
-function resetPipeline() {
-  document.querySelectorAll('.pipeline-stage').forEach(s => {
-    s.classList.remove('done', 'active-stage');
-  });
-  document.getElementById('pipelineResult').style.display = 'none';
-  document.getElementById('runPipelineBtn').disabled = false;
-}
-
-function runPipeline() {
-  if (!selectedTier) return;
-  document.getElementById('runPipelineBtn').disabled = true;
-  const stages = document.querySelectorAll('.pipeline-stage');
-  const d = tierData[selectedTier];
-
-  const stageDetails = [
-    `Assigned: ${d.badge} tier. ${d.vendor.split(':')[1]}`,
-    d.roiDecision,
-    `Selected: ${d.model}`,
-    `Generating title, extracting attributes...`,
-    `Checking against acceptance criteria...`,
-    `Quality: ${d.quality}. ${parseInt(d.quality) >= 70 ? 'Auto-published.' : 'Routed for review.'}`
+function FeatureCards() {
+  const cards = [
+    {
+      eyebrow: "Strategy",
+      title: "The walkthrough",
+      desc: "Executive narrative: ten problems across two AI systems, the architectural shift that resolves them, every loose thread closed on screen.",
+      href: "Walkthrough.html",
+      cta: "Read the strategy →",
+      accent: "var(--dh-red)",
+    },
+    {
+      eyebrow: "Demo",
+      title: "Pipeline in motion",
+      desc: "A product enters as a messy vendor upload and leaves as an enriched, categorized listing. Ten scenes, scroll-driven, end to end.",
+      href: "Demo.html",
+      cta: "Watch the pipeline →",
+      accent: "var(--green-2)",
+    },
   ];
-
-  stages.forEach((stage, i) => {
-    setTimeout(() => {
-      if (i > 0) stages[i-1].classList.remove('active-stage');
-      stages[i-1 >= 0 ? i-1 : 0].classList.add('done');
-      stage.classList.add('active-stage');
-      stage.querySelector('.stage-detail').textContent = stageDetails[i];
-
-      if (i === stages.length - 1) {
-        setTimeout(() => {
-          stage.classList.remove('active-stage');
-          stage.classList.add('done');
-          showResult();
-        }, 800);
-      }
-    }, (i + 1) * 700);
-  });
+  return (
+    <section style={{ padding: "0 28px 88px", maxWidth: 1100, margin: "0 auto" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        {cards.map((c, i) => (
+          <a key={i} href={c.href} style={{
+            display: "block",
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+            borderTop: `3px solid ${c.accent}`,
+            borderRadius: "var(--radius-lg)",
+            padding: 26,
+            textDecoration: "none",
+            color: "var(--ink)",
+            boxShadow: "var(--shadow-1)",
+            transition: "transform 180ms ease, box-shadow 180ms ease",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "var(--shadow-2)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "var(--shadow-1)"; }}
+          >
+            <div className="eyebrow" style={{ color: c.accent }}>{c.eyebrow}</div>
+            <div style={{ marginTop: 10, fontSize: 26, fontWeight: 700, letterSpacing: "-0.015em" }}>{c.title}</div>
+            <div style={{ marginTop: 10, fontSize: 15, color: "var(--ink-soft)", lineHeight: 1.55 }}>{c.desc}</div>
+            <div style={{ marginTop: 18, fontSize: 14, fontWeight: 600, color: c.accent }}>{c.cta}</div>
+          </a>
+        ))}
+      </div>
+    </section>
+  );
 }
 
-function showResult() {
-  const d = tierData[selectedTier];
-  document.getElementById('pipelineResult').style.display = 'block';
+function Team() {
+  return (
+    <section style={{ padding: "0 28px 120px", maxWidth: 1200, margin: "0 auto" }}>
+      <div style={{ marginBottom: 40, textAlign: "center" }}>
+        <div className="eyebrow">Behind the work</div>
+        <h2 style={{ margin: "10px 0 0", fontSize: 44, fontWeight: 700, letterSpacing: "-0.025em", color: "var(--ink)" }}>Our team</h2>
+        <p style={{ marginTop: 10, fontSize: 16, color: "var(--ink-mute)", maxWidth: 540, marginLeft: "auto", marginRight: "auto" }}>
+          The product, engineering, and ML group building Dynamic Content for Delivery Hero.
+        </p>
+      </div>
 
-  document.getElementById('beforeTitle').textContent = d.beforeTitle;
-  document.getElementById('afterTitle').textContent = d.afterTitle;
-  document.getElementById('beforeNote').textContent = d.beforeNote;
-  document.getElementById('afterNote').textContent = d.afterNote;
-
-  document.getElementById('beforeAttrs').innerHTML = d.beforeAttrs.map(a =>
-    `<span class="attr-tag ${a.status}">${a.name}</span>`
-  ).join('');
-  document.getElementById('afterAttrs').innerHTML = d.afterAttrs.map(a =>
-    `<span class="attr-tag ${a.status}">${a.name}</span>`
-  ).join('');
-
-  document.getElementById('metricQuality').textContent = d.quality;
-  document.getElementById('metricQualityDelta').textContent = d.qualityDelta;
-  document.getElementById('metricCost').textContent = d.cost;
-  document.getElementById('metricCostDelta').textContent = d.costDelta;
-  document.getElementById('metricSpeed').textContent = d.speed;
-  document.getElementById('metricSpeedDelta').textContent = d.speedDelta;
-
-  // Update product card attrs
-  document.getElementById('productAttrs').innerHTML = d.afterAttrs.map(a =>
-    `<span class="attr-tag ${a.status}">${a.name}</span>`
-  ).join('');
-
-  document.getElementById('pipelineResult').scrollIntoView({behavior:'smooth', block:'start'});
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+        gap: 14,
+      }}>
+        {TEAM.map((m, i) => (
+          <div key={m.name} className="fade-up" style={{
+            padding: 22,
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+            borderRadius: "var(--radius-lg)",
+            display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center",
+            animationDelay: `${i * 50}ms`,
+            boxShadow: "var(--shadow-1)",
+          }}>
+            <Avatar name={m.name} tint={m.tint} edge={m.edge} accent={m.accent} size={84}/>
+            <div style={{ marginTop: 14, fontSize: 15, fontWeight: 600, color: "var(--ink)", letterSpacing: "-0.005em" }}>{m.name}</div>
+            <div style={{ marginTop: 4, fontSize: 12.5, color: "var(--ink-mute)" }}>{m.role}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
 
-// QA FEED
-const qaEvents = [
-  {type:'green', msg:'Inline QA: Title passed for "Pepsi Max Zero Sugar 330ml" (Pro tier)', time:'now'},
-  {type:'amber', msg:'Pattern detected: 23% of Electronics titles missing voltage spec in APAC', time:'12s ago'},
-  {type:'green', msg:'Herogen auto-fix deployed: "add 1 Piece" rule for dairy (MENA)', time:'2m ago'},
-  {type:'green', msg:'Model benchmark: Claude 4 Sonnet +2.1% accuracy on Plus title gen', time:'5m ago'},
-  {type:'red', msg:'Regression alert: Spanish flavor extraction drop (-8%) after locale update', time:'8m ago'},
-  {type:'green', msg:'Inline QA: 47 products auto-published for Enterprise vendor (Carrefour)', time:'12m ago'},
-  {type:'amber', msg:'Herogen escalated: Category remap for "Tobacco > Smoking" affects variant groups', time:'18m ago'},
-  {type:'green', msg:'Model switch: GPT-4.1-mini replaced Gemini Flash for Pro attribute extraction (+4% quality, same cost)', time:'25m ago'},
-  {type:'green', msg:'Inline QA: Master category confidence 96.2% for batch of 230 packaged food items', time:'31m ago'},
-  {type:'amber', msg:'Monitoring QA: Brand inconsistency pattern in UltraFresh category (38 products)', time:'40m ago'},
-];
-
-function populateQaFeed() {
-  const feed = document.getElementById('qaFeed');
-  feed.innerHTML = '';
-  qaEvents.forEach(e => {
-    addQaItem(e.type, e.msg, e.time, false);
-  });
+function Footer() {
+  return (
+    <footer style={{
+      padding: "32px 28px 48px",
+      borderTop: "1px solid var(--border)",
+      background: "var(--surface)",
+    }}>
+      <div style={{
+        maxWidth: 1280, margin: "0 auto",
+        display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 14, alignItems: "center",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <DCLockup size={22} fontSize={14}/>
+          <span style={{ width: 1, height: 16, background: "var(--border)" }}/>
+          <DHBadge/>
+        </div>
+        <div style={{ fontSize: 12, color: "var(--ink-mute)" }}>
+          Internal preview · not for external distribution
+        </div>
+      </div>
+    </footer>
+  );
 }
 
-function addQaItem(type, msg, time, animate) {
-  const feed = document.getElementById('qaFeed');
-  const item = document.createElement('div');
-  item.className = 'qa-item';
-  if (!animate) item.style.animation = 'none';
-  item.innerHTML = `
-    <div class="dot" style="background:var(--${type === 'green' ? 'green' : type === 'amber' ? 'amber' : 'dh-red'});box-shadow:0 0 6px var(--${type === 'green' ? 'green' : type === 'amber' ? 'amber' : 'dh-red'});"></div>
-    <div style="flex:1">${msg}</div>
-    <div class="timestamp">${time}</div>
-  `;
-  feed.insertBefore(item, feed.firstChild);
+function App() {
+  return (
+    <div>
+      <TopNav active="home"/>
+      <Hero/>
+      <FeatureCards/>
+      <Team/>
+      <Footer/>
+    </div>
+  );
 }
 
-const newEvents = [
-  {type:'green', msg:'Inline QA: Variant group validated for "Coca-Cola 330ml" family (12 variants)', time:'just now'},
-  {type:'green', msg:'Herogen fix verified: APAC title format rule passing at 99.2%', time:'just now'},
-  {type:'amber', msg:'Monitoring QA: Size unit inconsistency ("ml" vs "mL") in Beverages', time:'just now'},
-  {type:'green', msg:'Model Selection Agent: New model candidate registered (Llama 4 Scout)', time:'just now'},
-  {type:'red', msg:'Inline QA reject: Title too long (142 chars) for "Nestlé KitKat..." (Enterprise). Sent for review.', time:'just now'},
-  {type:'green', msg:'Auto-publish: 89 Lite-tier products passed hygiene bar and went live', time:'just now'},
-];
-let eventIdx = 0;
-
-function addQaEvent() {
-  const e = newEvents[eventIdx % newEvents.length];
-  addQaItem(e.type, e.msg, e.time, true);
-  eventIdx++;
-}
-
-// BENCHMARK
-function showBenchmark(task) {
-  document.querySelectorAll('#benchmarkChart .btn-group .btn').forEach(b => {
-    b.className = 'btn btn-sm btn-secondary';
-  });
-  event.target.className = 'btn btn-sm btn-primary';
-}
-
-// INIT
-window.addEventListener('load', () => {
-  drawLoopArrows();
-  populateQaFeed();
-  // Start loop animation
-  setTimeout(() => {
-    setInterval(animateLoop, 3000);
-  }, 1000);
-});
-
-window.addEventListener('resize', drawLoopArrows);
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
-
 </body>
 </html>

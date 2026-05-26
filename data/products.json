@@ -1,0 +1,728 @@
+{
+  "metadata": {
+    "description": "Sample product dataset for Dynamic Content Strategy walkthrough. 30 products across 3 platforms, each with vendor-submitted raw titles (intentionally broken) and AI-enriched titles at 4 tiers.",
+    "platforms": {
+      "talabat": { "region": "MENA", "locale": "en", "titleFormat": "brand-first", "countries": ["UAE", "Saudi Arabia", "Egypt", "Pakistan"] },
+      "pedidosya": { "region": "LATAM", "locale": "es", "titleFormat": "generic-first", "countries": ["Argentina", "Chile", "Colombia"] },
+      "yemeksepeti": { "region": "Turkey", "locale": "tr", "titleFormat": "brand-first", "countries": ["Turkey"] }
+    },
+    "tiers": {
+      "lite": { "label": "Lite", "description": "Baseline hygiene. Fix typos, normalize caps/units. Cheapest model.", "model": "DH-Title-v3 (fine-tuned)", "costPerProduct": "$0.001", "vendorExample": "Small local shop (1 store)" },
+      "pro": { "label": "Pro", "description": "Category guidelines. Brand positioning. Light variant grouping.", "model": "GPT-4.1-mini", "costPerProduct": "$0.003", "vendorExample": "Regional chain (50+ stores)" },
+      "plus": { "label": "Plus", "description": "Granular guidelines. Full variant dedup. Deep attributes.", "model": "Claude 4 Sonnet", "costPerProduct": "$0.015", "vendorExample": "National retailer (200+ stores)" },
+      "enterprise": { "label": "Enterprise", "description": "Best model. Trust-class validation. Image verification.", "model": "GPT-4.1", "costPerProduct": "$0.030", "vendorExample": "Strategic partner (Carrefour, Lulu)" }
+    }
+  },
+
+  "products": [
+    {
+      "id": "MPC-100001",
+      "platform": "talabat",
+      "brand": "Almarai",
+      "vendor": "Al-Maha Mini Market",
+      "vendorTier": "lite",
+      "country": "UAE",
+      "category": "packaged_food_beverages",
+      "rawTitle": "almarai full fat milk 1L",
+      "titleProblems": ["no capitalization", "no product type descriptor"],
+      "enrichment": {
+        "lite":       { "title": "Almarai Full Fat Milk 1L", "changes": "Title case applied" },
+        "pro":        { "title": "Almarai Full Fat Milk 1L - Fresh Dairy", "changes": "Title case + brand-first + category descriptor added" },
+        "plus":       { "title": "Almarai Full Fat Fresh Milk 1L - UHT Long Life", "changes": "Title case + brand-first + product type inferred + processing type added" },
+        "enterprise": { "title": "Almarai Full Fat Fresh Cow's Milk 1 Litre - UHT Long Life, No Preservatives", "changes": "Full enrichment + source animal + preservative status + unit spelled out" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Almarai", "size": "1L" },
+        "pro":        { "brand": "Almarai", "size": "1L", "fat": "Full Fat", "flavor": "Plain" },
+        "plus":       { "brand": "Almarai", "size": "1L", "fat": "Full Fat (3.1%)", "flavor": "Plain", "dietary": "Gluten-Free", "origin": "Saudi Arabia" },
+        "enterprise": { "brand": "Almarai", "size": "1L", "fat": "Full Fat (3.1%)", "flavor": "Plain", "dietary": "Gluten-Free", "origin": "Saudi Arabia", "storage": "Room Temperature", "shelfLife": "6 months" }
+      },
+      "categoryPrediction": { "l1": "Food & Beverages", "l2": "Dairy", "l3": "Fresh Milk", "confidence": 0.94 }
+    },
+    {
+      "id": "MPC-100002",
+      "platform": "talabat",
+      "brand": "Pepsi",
+      "vendor": "Corner Mart Riyadh",
+      "vendorTier": "lite",
+      "country": "Saudi Arabia",
+      "category": "packaged_food_beverages",
+      "rawTitle": "PEPSI CAN 330 ML",
+      "titleProblems": ["ALL CAPS", "space in unit (330 ML)", "missing variant (regular vs zero vs max)"],
+      "enrichment": {
+        "lite":       { "title": "Pepsi Can 330mL", "changes": "Title case + unit normalized" },
+        "pro":        { "title": "Pepsi Regular Carbonated Drink Can 330mL", "changes": "Title case + variant specified + product type added" },
+        "plus":       { "title": "Pepsi Regular Carbonated Soft Drink Can 330mL", "changes": "Full product type + variant + category descriptor" },
+        "enterprise": { "title": "Pepsi Regular Carbonated Soft Drink Can 330mL - Caffeine, No Sugar-Free", "changes": "Full enrichment + dietary callouts" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Pepsi", "size": "330mL" },
+        "pro":        { "brand": "Pepsi", "size": "330mL", "flavor": "Regular", "packaging": "Can" },
+        "plus":       { "brand": "Pepsi", "size": "330mL", "flavor": "Regular", "packaging": "Can", "category": "Carbonated Drinks", "dietary": "Contains Caffeine" },
+        "enterprise": { "brand": "Pepsi", "size": "330mL", "flavor": "Regular", "packaging": "Can", "category": "Carbonated Drinks", "dietary": "Contains Caffeine", "origin": "Saudi Arabia", "servings": "1" }
+      },
+      "categoryPrediction": { "l1": "Food & Beverages", "l2": "Beverages", "l3": "Carbonated Drinks", "confidence": 0.97 }
+    },
+    {
+      "id": "MPC-100003",
+      "platform": "talabat",
+      "brand": "Tide",
+      "vendor": "Quick Stop Lahore",
+      "vendorTier": "lite",
+      "country": "Pakistan",
+      "category": "packaged_non_food",
+      "rawTitle": "tide liquid 3l orignal",
+      "titleProblems": ["no capitalization", "typo: orignal -> Original", "missing product type (detergent)"],
+      "enrichment": {
+        "lite":       { "title": "Tide Liquid 3L Original", "changes": "Title case + typo fixed + unit normalized" },
+        "pro":        { "title": "Tide Original Liquid Detergent 3L", "changes": "Typo fixed + product type added + size moved to end" },
+        "plus":       { "title": "Tide Original Liquid Laundry Detergent 3L", "changes": "Full product type + sub-category (laundry)" },
+        "enterprise": { "title": "Tide Original Liquid Laundry Detergent 3L - Concentrated Formula", "changes": "Full enrichment + formula type from image analysis" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Tide", "size": "3L" },
+        "pro":        { "brand": "Tide", "size": "3L", "variant": "Original", "type": "Liquid Detergent" },
+        "plus":       { "brand": "Tide", "size": "3L", "variant": "Original", "type": "Liquid Laundry Detergent", "scent": "Original" },
+        "enterprise": { "brand": "Tide", "size": "3L", "variant": "Original", "type": "Liquid Laundry Detergent", "scent": "Original", "formula": "Concentrated" }
+      },
+      "categoryPrediction": { "l1": "Non-Food", "l2": "Cleaning", "l3": "Laundry Detergent", "confidence": 0.91 }
+    },
+    {
+      "id": "MPC-100004",
+      "platform": "talabat",
+      "brand": "Nutella",
+      "vendor": "Corner Mart Riyadh",
+      "vendorTier": "lite",
+      "country": "Saudi Arabia",
+      "category": "packaged_food_beverages",
+      "rawTitle": "nutella hazelnut spred 350g",
+      "titleProblems": ["no capitalization", "typo: spred -> Spread"],
+      "enrichment": {
+        "lite":       { "title": "Nutella Hazelnut Spread 350g", "changes": "Title case + typo fixed" },
+        "pro":        { "title": "Nutella Hazelnut Chocolate Spread 350g", "changes": "Typo fixed + product sub-type added (chocolate)" },
+        "plus":       { "title": "Nutella Hazelnut Chocolate Spread Jar 350g", "changes": "Packaging type added + full descriptor" },
+        "enterprise": { "title": "Nutella Hazelnut Cocoa Chocolate Spread Jar 350g - Contains Milk & Soy", "changes": "Full enrichment + allergen info from image OCR" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Nutella", "size": "350g" },
+        "pro":        { "brand": "Nutella", "size": "350g", "flavor": "Hazelnut", "type": "Chocolate Spread" },
+        "plus":       { "brand": "Nutella", "size": "350g", "flavor": "Hazelnut", "type": "Chocolate Spread", "packaging": "Jar" },
+        "enterprise": { "brand": "Nutella", "size": "350g", "flavor": "Hazelnut", "type": "Chocolate Spread", "packaging": "Jar", "allergens": "Milk, Soy", "origin": "Italy" }
+      },
+      "categoryPrediction": { "l1": "Food & Beverages", "l2": "Breakfast & Spreads", "l3": "Chocolate Spreads", "confidence": 0.96 }
+    },
+    {
+      "id": "MPC-200001",
+      "platform": "talabat",
+      "brand": "Coca-Cola",
+      "vendor": "FreshMart Regional",
+      "vendorTier": "pro",
+      "country": "UAE",
+      "category": "packaged_food_beverages",
+      "rawTitle": "coca cola zero sugar 330ml can",
+      "titleProblems": ["no capitalization", "brand name not hyphenated"],
+      "enrichment": {
+        "lite":       { "title": "Coca Cola Zero Sugar 330mL Can", "changes": "Title case + unit normalized" },
+        "pro":        { "title": "Coca-Cola Zero Sugar Carbonated Drink Can 330mL", "changes": "Brand corrected (hyphen) + product type + size moved to end" },
+        "plus":       { "title": "Coca-Cola Zero Sugar Carbonated Soft Drink Can 330mL", "changes": "Full product type + category descriptor" },
+        "enterprise": { "title": "Coca-Cola Zero Sugar Carbonated Soft Drink Can 330mL - Zero Calories, Caffeine", "changes": "Full enrichment + dietary callouts from image" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Coca-Cola", "size": "330mL" },
+        "pro":        { "brand": "Coca-Cola", "size": "330mL", "flavor": "Zero Sugar", "packaging": "Can" },
+        "plus":       { "brand": "Coca-Cola", "size": "330mL", "flavor": "Zero Sugar", "packaging": "Can", "dietary": "Sugar-Free, Zero Calories" },
+        "enterprise": { "brand": "Coca-Cola", "size": "330mL", "flavor": "Zero Sugar", "packaging": "Can", "dietary": "Sugar-Free, Zero Calories", "caffeine": "Yes", "origin": "UAE" }
+      },
+      "categoryPrediction": { "l1": "Food & Beverages", "l2": "Beverages", "l3": "Carbonated Drinks", "confidence": 0.98 }
+    },
+    {
+      "id": "MPC-200002",
+      "platform": "talabat",
+      "brand": "Head & Shoulders",
+      "vendor": "GrocerPro SA",
+      "vendorTier": "pro",
+      "country": "Saudi Arabia",
+      "category": "packaged_non_food",
+      "rawTitle": "head and shoulders shampoo 400ml antidandruf",
+      "titleProblems": ["brand name wrong (and vs &)", "typo: antidandruf -> Anti-Dandruff", "no capitalization"],
+      "enrichment": {
+        "lite":       { "title": "Head And Shoulders Shampoo 400mL Anti-Dandruff", "changes": "Title case + typo fixed + unit normalized" },
+        "pro":        { "title": "Head & Shoulders Anti-Dandruff Shampoo 400mL", "changes": "Brand corrected (&) + typo fixed + descriptor repositioned" },
+        "plus":       { "title": "Head & Shoulders Anti-Dandruff Shampoo 400mL - Classic Clean", "changes": "Brand corrected + variant name added from image" },
+        "enterprise": { "title": "Head & Shoulders Classic Clean Anti-Dandruff Shampoo 400mL - Pyrithione Zinc", "changes": "Full enrichment + active ingredient from image OCR" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Head & Shoulders", "size": "400mL" },
+        "pro":        { "brand": "Head & Shoulders", "size": "400mL", "type": "Shampoo", "variant": "Anti-Dandruff" },
+        "plus":       { "brand": "Head & Shoulders", "size": "400mL", "type": "Anti-Dandruff Shampoo", "variant": "Classic Clean", "hairType": "All Types" },
+        "enterprise": { "brand": "Head & Shoulders", "size": "400mL", "type": "Anti-Dandruff Shampoo", "variant": "Classic Clean", "hairType": "All Types", "activeIngredient": "Pyrithione Zinc", "origin": "France" }
+      },
+      "categoryPrediction": { "l1": "Non-Food", "l2": "Personal Care", "l3": "Shampoo", "confidence": 0.93 }
+    },
+    {
+      "id": "MPC-200003",
+      "platform": "talabat",
+      "brand": "Philadelphia",
+      "vendor": "GrocerPro SA",
+      "vendorTier": "pro",
+      "country": "Saudi Arabia",
+      "category": "packaged_food_beverages",
+      "rawTitle": "philadelphia cream cheese 200g orignal",
+      "titleProblems": ["no capitalization", "typo: orignal -> Original"],
+      "enrichment": {
+        "lite":       { "title": "Philadelphia Cream Cheese 200g Original", "changes": "Title case + typo fixed" },
+        "pro":        { "title": "Philadelphia Original Cream Cheese Spread 200g", "changes": "Typo fixed + variant repositioned + product type clarified" },
+        "plus":       { "title": "Philadelphia Original Cream Cheese Spread 200g - Pasteurized", "changes": "Full descriptor + processing type" },
+        "enterprise": { "title": "Philadelphia Original Pasteurized Cream Cheese Spread 200g - Refrigerated, Contains Milk", "changes": "Full enrichment + storage + allergens" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Philadelphia", "size": "200g" },
+        "pro":        { "brand": "Philadelphia", "size": "200g", "flavor": "Original", "type": "Cream Cheese" },
+        "plus":       { "brand": "Philadelphia", "size": "200g", "flavor": "Original", "type": "Cream Cheese Spread", "processing": "Pasteurized" },
+        "enterprise": { "brand": "Philadelphia", "size": "200g", "flavor": "Original", "type": "Cream Cheese Spread", "processing": "Pasteurized", "storage": "Refrigerated", "allergens": "Milk" }
+      },
+      "categoryPrediction": { "l1": "Food & Beverages", "l2": "Dairy", "l3": "Cream Cheese", "confidence": 0.95 }
+    },
+    {
+      "id": "MPC-300001",
+      "platform": "talabat",
+      "brand": "Galaxy",
+      "vendor": "Carrefour Hypermarket",
+      "vendorTier": "enterprise",
+      "country": "UAE",
+      "category": "packaged_food_beverages",
+      "rawTitle": "galaxy smooth milk choclate bar 90g",
+      "titleProblems": ["no capitalization", "typo: choclate -> Chocolate"],
+      "enrichment": {
+        "lite":       { "title": "Galaxy Smooth Milk Chocolate Bar 90g", "changes": "Title case + typo fixed" },
+        "pro":        { "title": "Galaxy Smooth Milk Chocolate Bar 90g", "changes": "Title case + typo fixed + brand-first confirmed" },
+        "plus":       { "title": "Galaxy Smooth Milk Chocolate Bar 90g", "changes": "Typo fixed + product type confirmed from image" },
+        "enterprise": { "title": "Galaxy Smooth Milk Chocolate Bar 90g - Single Serve, Contains Milk & Soy", "changes": "Full enrichment + serving type + allergens from image OCR" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Galaxy", "size": "90g" },
+        "pro":        { "brand": "Galaxy", "size": "90g", "flavor": "Smooth Milk Chocolate", "type": "Chocolate Bar" },
+        "plus":       { "brand": "Galaxy", "size": "90g", "flavor": "Smooth Milk Chocolate", "type": "Chocolate Bar", "cocoa": "Milk Chocolate" },
+        "enterprise": { "brand": "Galaxy", "size": "90g", "flavor": "Smooth Milk Chocolate", "type": "Chocolate Bar", "cocoa": "Milk Chocolate", "allergens": "Milk, Soy", "servings": "1", "origin": "UAE" }
+      },
+      "categoryPrediction": { "l1": "Food & Beverages", "l2": "Snacks & Confectionery", "l3": "Chocolate Bars", "confidence": 0.97 }
+    },
+    {
+      "id": "MPC-300002",
+      "platform": "talabat",
+      "brand": "Samsung",
+      "vendor": "Carrefour Hypermarket",
+      "vendorTier": "enterprise",
+      "country": "UAE",
+      "category": "electronics",
+      "rawTitle": "samsung charger usbc 25w",
+      "titleProblems": ["no capitalization", "usbc not formatted (USB-C)", "missing product descriptor"],
+      "enrichment": {
+        "lite":       { "title": "Samsung Charger USB-C 25W", "changes": "Title case + USB-C normalized" },
+        "pro":        { "title": "Samsung USB-C Travel Charger 25W", "changes": "USB-C normalized + product type added + restructured" },
+        "plus":       { "title": "Samsung USB-C Fast Travel Charger Adapter 25W - White", "changes": "Full product type + color from image + fast charging noted" },
+        "enterprise": { "title": "Samsung 25W USB-C Super Fast Charging Travel Adapter - White, Compatible with Galaxy Series", "changes": "Full enrichment + compatibility info + feature callout" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Samsung", "power": "25W" },
+        "pro":        { "brand": "Samsung", "power": "25W", "connector": "USB-C", "type": "Travel Charger" },
+        "plus":       { "brand": "Samsung", "power": "25W", "connector": "USB-C", "type": "Fast Charger Adapter", "color": "White" },
+        "enterprise": { "brand": "Samsung", "power": "25W", "connector": "USB-C", "type": "Super Fast Charging Adapter", "color": "White", "compatibility": "Galaxy Series", "voltage": "100-240V" }
+      },
+      "categoryPrediction": { "l1": "Electronics", "l2": "Mobile Accessories", "l3": "Chargers & Cables", "confidence": 0.89 }
+    },
+    {
+      "id": "MPC-300003",
+      "platform": "talabat",
+      "brand": "Lurpak",
+      "vendor": "Panda Supermarket",
+      "vendorTier": "plus",
+      "country": "Saudi Arabia",
+      "category": "packaged_food_beverages",
+      "rawTitle": "lurpak butter unsalted 200g",
+      "titleProblems": ["no capitalization", "missing processing type (Danish)"],
+      "enrichment": {
+        "lite":       { "title": "Lurpak Butter Unsalted 200g", "changes": "Title case applied" },
+        "pro":        { "title": "Lurpak Unsalted Butter Block 200g", "changes": "Title case + variant repositioned + packaging type" },
+        "plus":       { "title": "Lurpak Unsalted Danish Butter Block 200g", "changes": "Origin-style added + packaging type" },
+        "enterprise": { "title": "Lurpak Unsalted Danish Butter Block 200g - Pasteurized, Refrigerated", "changes": "Full enrichment + processing + storage from guidelines" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Lurpak", "size": "200g" },
+        "pro":        { "brand": "Lurpak", "size": "200g", "flavor": "Unsalted", "type": "Butter" },
+        "plus":       { "brand": "Lurpak", "size": "200g", "flavor": "Unsalted", "type": "Danish Butter", "packaging": "Block", "origin": "Denmark" },
+        "enterprise": { "brand": "Lurpak", "size": "200g", "flavor": "Unsalted", "type": "Danish Butter", "packaging": "Block", "origin": "Denmark", "processing": "Pasteurized", "storage": "Refrigerated" }
+      },
+      "categoryPrediction": { "l1": "Food & Beverages", "l2": "Dairy", "l3": "Butter & Margarine", "confidence": 0.92 }
+    },
+    {
+      "id": "MPC-400001",
+      "platform": "talabat",
+      "brand": "Local Farm",
+      "vendor": "Carrefour Hypermarket",
+      "vendorTier": "enterprise",
+      "country": "UAE",
+      "category": "ultrafresh_loose_food_beverages",
+      "rawTitle": "fresh local tomatoes per kg",
+      "titleProblems": ["vague brand (Local Farm)", "no origin specified", "per kg is informal"],
+      "enrichment": {
+        "lite":       { "title": "Fresh Local Tomatoes Per kg", "changes": "Title case applied" },
+        "pro":        { "title": "Fresh Local Tomatoes 1kg", "changes": "Unit standardized (per kg -> 1kg)" },
+        "plus":       { "title": "Fresh Local Roma Tomatoes 1kg", "changes": "Variety added from image analysis" },
+        "enterprise": { "title": "Fresh Local Roma Tomatoes 1kg - UAE Sourced, Hand-Selected", "changes": "Full enrichment + origin + quality descriptor" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Local Farm", "size": "1kg" },
+        "pro":        { "brand": "Local Farm", "size": "1kg", "type": "Tomatoes", "freshness": "Fresh" },
+        "plus":       { "brand": "Local Farm", "size": "1kg", "type": "Roma Tomatoes", "freshness": "Fresh", "origin": "UAE" },
+        "enterprise": { "brand": "Local Farm", "size": "1kg", "type": "Roma Tomatoes", "freshness": "Fresh", "origin": "UAE", "quality": "Hand-Selected", "storage": "Refrigerated" }
+      },
+      "categoryPrediction": { "l1": "Food & Beverages", "l2": "Fresh Produce", "l3": "Tomatoes", "confidence": 0.86 }
+    },
+    {
+      "id": "MPC-500001",
+      "platform": "pedidosya",
+      "brand": "Coca-Cola",
+      "vendor": "Almacen Don Pedro",
+      "vendorTier": "lite",
+      "country": "Argentina",
+      "category": "packaged_food_beverages",
+      "rawTitle": "coca cola lata 354ml",
+      "titleProblems": ["no capitalization", "brand not hyphenated", "missing variant (regular/zero/light)"],
+      "enrichment": {
+        "lite":       { "title": "Coca Cola Lata 354mL", "changes": "Title case + unit normalized" },
+        "pro":        { "title": "Gaseosa Coca-Cola Regular Lata 354mL", "changes": "Generic-first format (Spanish) + brand corrected + variant specified" },
+        "plus":       { "title": "Gaseosa Coca-Cola Regular Sabor Original Lata 354mL", "changes": "Generic-first + full flavor descriptor" },
+        "enterprise": { "title": "Gaseosa Coca-Cola Regular Sabor Original Lata 354mL - Con Cafeina", "changes": "Full enrichment + dietary info in Spanish" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Coca-Cola", "size": "354mL" },
+        "pro":        { "brand": "Coca-Cola", "size": "354mL", "flavor": "Regular", "packaging": "Lata" },
+        "plus":       { "brand": "Coca-Cola", "size": "354mL", "flavor": "Regular / Original", "packaging": "Lata", "type": "Gaseosa" },
+        "enterprise": { "brand": "Coca-Cola", "size": "354mL", "flavor": "Regular / Original", "packaging": "Lata", "type": "Gaseosa", "caffeine": "Con Cafeina", "origin": "Argentina" }
+      },
+      "categoryPrediction": { "l1": "Alimentos y Bebidas", "l2": "Bebidas", "l3": "Gaseosas", "confidence": 0.97 }
+    },
+    {
+      "id": "MPC-500002",
+      "platform": "pedidosya",
+      "brand": "Quilmes",
+      "vendor": "Super Dia Express",
+      "vendorTier": "pro",
+      "country": "Argentina",
+      "category": "packaged_food_beverages",
+      "rawTitle": "quilmes cristal cerveza 473 ml lata",
+      "titleProblems": ["no capitalization", "space in unit (473 ml)", "word order suboptimal for Spanish format"],
+      "enrichment": {
+        "lite":       { "title": "Quilmes Cristal Cerveza 473mL Lata", "changes": "Title case + unit normalized" },
+        "pro":        { "title": "Cerveza Quilmes Cristal Lata 473mL", "changes": "Generic-first (Cerveza) + restructured" },
+        "plus":       { "title": "Cerveza Rubia Quilmes Cristal Lata 473mL", "changes": "Generic-first + beer style (Rubia/Blonde)" },
+        "enterprise": { "title": "Cerveza Rubia Quilmes Cristal Lata 473mL - 4.9% Alcohol", "changes": "Full enrichment + ABV from product data" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Quilmes", "size": "473mL" },
+        "pro":        { "brand": "Quilmes", "size": "473mL", "variant": "Cristal", "packaging": "Lata", "type": "Cerveza" },
+        "plus":       { "brand": "Quilmes", "size": "473mL", "variant": "Cristal", "packaging": "Lata", "type": "Cerveza Rubia", "style": "Lager" },
+        "enterprise": { "brand": "Quilmes", "size": "473mL", "variant": "Cristal", "packaging": "Lata", "type": "Cerveza Rubia", "style": "Lager", "abv": "4.9%", "origin": "Argentina" }
+      },
+      "categoryPrediction": { "l1": "Alimentos y Bebidas", "l2": "Bebidas Alcoholicas", "l3": "Cervezas", "confidence": 0.95 }
+    },
+    {
+      "id": "MPC-500003",
+      "platform": "pedidosya",
+      "brand": "Arcor",
+      "vendor": "Almacen Don Pedro",
+      "vendorTier": "lite",
+      "country": "Argentina",
+      "category": "packaged_food_beverages",
+      "rawTitle": "arcor mermelada durazno 454g",
+      "titleProblems": ["no capitalization", "missing product descriptor (light/diet/clasica)"],
+      "enrichment": {
+        "lite":       { "title": "Arcor Mermelada Durazno 454g", "changes": "Title case applied" },
+        "pro":        { "title": "Mermelada Arcor Durazno Clasica 454g", "changes": "Generic-first format + variant (Clasica)" },
+        "plus":       { "title": "Mermelada Arcor Durazno Clasica Frasco 454g", "changes": "Generic-first + packaging type (Frasco/Jar)" },
+        "enterprise": { "title": "Mermelada Arcor Durazno Clasica Frasco 454g - Sin Conservantes", "changes": "Full enrichment + preservative info" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Arcor", "size": "454g" },
+        "pro":        { "brand": "Arcor", "size": "454g", "flavor": "Durazno", "type": "Mermelada" },
+        "plus":       { "brand": "Arcor", "size": "454g", "flavor": "Durazno", "type": "Mermelada Clasica", "packaging": "Frasco" },
+        "enterprise": { "brand": "Arcor", "size": "454g", "flavor": "Durazno", "type": "Mermelada Clasica", "packaging": "Frasco", "preservatives": "Sin Conservantes" }
+      },
+      "categoryPrediction": { "l1": "Alimentos y Bebidas", "l2": "Desayuno y Merienda", "l3": "Mermeladas", "confidence": 0.93 }
+    },
+    {
+      "id": "MPC-500004",
+      "platform": "pedidosya",
+      "brand": "Ala",
+      "vendor": "Carrefour Express",
+      "vendorTier": "plus",
+      "country": "Argentina",
+      "category": "packaged_non_food",
+      "rawTitle": "ala jabon liquido ropa 3 lt",
+      "titleProblems": ["no capitalization", "wrong unit abbreviation (lt -> L)", "missing variant (regular/matic/bebe)"],
+      "enrichment": {
+        "lite":       { "title": "Ala Jabon Liquido Ropa 3L", "changes": "Title case + unit normalized" },
+        "pro":        { "title": "Jabon Liquido Ala Para Ropa Regular 3L", "changes": "Generic-first + variant specified + restructured" },
+        "plus":       { "title": "Jabon Liquido Ala Para Lavarropas Regular 3L", "changes": "Generic-first + machine-wash specified" },
+        "enterprise": { "title": "Jabon Liquido Ala Para Lavarropas Regular 3L - Apto Automatico y Manual", "changes": "Full enrichment + compatibility info" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Ala", "size": "3L" },
+        "pro":        { "brand": "Ala", "size": "3L", "variant": "Regular", "type": "Jabon Liquido" },
+        "plus":       { "brand": "Ala", "size": "3L", "variant": "Regular", "type": "Jabon Liquido Para Lavarropas", "scent": "Original" },
+        "enterprise": { "brand": "Ala", "size": "3L", "variant": "Regular", "type": "Jabon Liquido Para Lavarropas", "scent": "Original", "compatibility": "Automatico y Manual" }
+      },
+      "categoryPrediction": { "l1": "No Alimentario", "l2": "Limpieza", "l3": "Jabones Para Ropa", "confidence": 0.90 }
+    },
+    {
+      "id": "MPC-600001",
+      "platform": "yemeksepeti",
+      "brand": "Ulker",
+      "vendor": "Bakkal Mehmet",
+      "vendorTier": "lite",
+      "country": "Turkey",
+      "category": "packaged_food_beverages",
+      "rawTitle": "ulker cikolata sutlu 80g",
+      "titleProblems": ["no capitalization", "missing special character (Ulker -> Ulker)", "no product type descriptor"],
+      "enrichment": {
+        "lite":       { "title": "Ulker Cikolata Sutlu 80g", "changes": "Title case applied" },
+        "pro":        { "title": "Ulker Sutlu Cikolata Tablet 80g", "changes": "Title case + product type (Tablet) + word order fixed" },
+        "plus":       { "title": "Ulker Sutlu Cikolata Tablet 80g", "changes": "Same as Pro (already well-structured for this product)" },
+        "enterprise": { "title": "Ulker Sutlu Cikolata Tablet 80g - Kakao %33, Tek Porsiyon", "changes": "Full enrichment + cocoa % + serving info" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Ulker", "size": "80g" },
+        "pro":        { "brand": "Ulker", "size": "80g", "flavor": "Sutlu (Milk)", "type": "Cikolata Tablet" },
+        "plus":       { "brand": "Ulker", "size": "80g", "flavor": "Sutlu (Milk)", "type": "Cikolata Tablet", "cocoa": "33%" },
+        "enterprise": { "brand": "Ulker", "size": "80g", "flavor": "Sutlu (Milk)", "type": "Cikolata Tablet", "cocoa": "33%", "servings": "1", "origin": "Turkey" }
+      },
+      "categoryPrediction": { "l1": "Gida ve Icecek", "l2": "Atistirmalik", "l3": "Cikolata", "confidence": 0.96 }
+    },
+    {
+      "id": "MPC-600002",
+      "platform": "yemeksepeti",
+      "brand": "Pinar",
+      "vendor": "Migros Sanal Market",
+      "vendorTier": "plus",
+      "country": "Turkey",
+      "category": "packaged_food_beverages",
+      "rawTitle": "pinar tam yagli sut 1l",
+      "titleProblems": ["no capitalization", "unit not standardized"],
+      "enrichment": {
+        "lite":       { "title": "Pinar Tam Yagli Sut 1L", "changes": "Title case + unit normalized" },
+        "pro":        { "title": "Pinar Tam Yagli Gunluk Sut 1L", "changes": "Title case + product type (Gunluk/Daily)" },
+        "plus":       { "title": "Pinar Tam Yagli Gunluk Pastorize Sut 1L", "changes": "Processing type added (Pastorize)" },
+        "enterprise": { "title": "Pinar Tam Yagli Gunluk Pastorize Inek Sutu 1L - Buzdolabinda Saklayin", "changes": "Full enrichment + source animal + storage instruction" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Pinar", "size": "1L" },
+        "pro":        { "brand": "Pinar", "size": "1L", "fat": "Tam Yagli (Full Fat)", "type": "Sut" },
+        "plus":       { "brand": "Pinar", "size": "1L", "fat": "Tam Yagli (Full Fat)", "type": "Gunluk Pastorize Sut", "origin": "Turkey" },
+        "enterprise": { "brand": "Pinar", "size": "1L", "fat": "Tam Yagli (Full Fat)", "type": "Gunluk Pastorize Inek Sutu", "origin": "Turkey", "storage": "Refrigerated", "source": "Cow" }
+      },
+      "categoryPrediction": { "l1": "Gida ve Icecek", "l2": "Sut Urunleri", "l3": "Gunluk Sut", "confidence": 0.94 }
+    },
+    {
+      "id": "MPC-600003",
+      "platform": "yemeksepeti",
+      "brand": "Fairy",
+      "vendor": "Bakkal Mehmet",
+      "vendorTier": "lite",
+      "country": "Turkey",
+      "category": "packaged_non_food",
+      "rawTitle": "fairy bulasik deterjani 1.5l limon",
+      "titleProblems": ["no capitalization", "unit not standardized", "scent at end instead of in description"],
+      "enrichment": {
+        "lite":       { "title": "Fairy Bulasik Deterjani 1.5L Limon", "changes": "Title case + unit normalized" },
+        "pro":        { "title": "Fairy Limon Sivi Bulasik Deterjani 1.5L", "changes": "Scent moved forward + product type (Sivi/Liquid) added" },
+        "plus":       { "title": "Fairy Limon Sivi Bulasik Deterjani 1.5L", "changes": "Same as Pro (well-structured)" },
+        "enterprise": { "title": "Fairy Limon Sivi Bulasik Deterjani 1.5L - Ekstra Kesif Formul", "changes": "Full enrichment + formula type from image" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Fairy", "size": "1.5L" },
+        "pro":        { "brand": "Fairy", "size": "1.5L", "scent": "Limon", "type": "Bulasik Deterjani" },
+        "plus":       { "brand": "Fairy", "size": "1.5L", "scent": "Limon", "type": "Sivi Bulasik Deterjani" },
+        "enterprise": { "brand": "Fairy", "size": "1.5L", "scent": "Limon", "type": "Sivi Bulasik Deterjani", "formula": "Ekstra Kesif" }
+      },
+      "categoryPrediction": { "l1": "Ev Bakimi", "l2": "Temizlik", "l3": "Bulasik Deterjani", "confidence": 0.95 }
+    },
+    {
+      "id": "MPC-600004",
+      "platform": "yemeksepeti",
+      "brand": "Eti",
+      "vendor": "A101 Market",
+      "vendorTier": "pro",
+      "country": "Turkey",
+      "category": "packaged_food_beverages",
+      "rawTitle": "ETI BROWNI INTENSE CIKOLATA 160G",
+      "titleProblems": ["ALL CAPS", "missing product category (Kek/Cake)"],
+      "enrichment": {
+        "lite":       { "title": "Eti Browni Intense Cikolata 160g", "changes": "Title case + unit normalized" },
+        "pro":        { "title": "Eti Browni Intense Cikolatali Kek 160g", "changes": "Title case + product type (Kek/Cake) added" },
+        "plus":       { "title": "Eti Browni Intense Cikolatali Kek 160g - Dolgulu", "changes": "Product type + filling descriptor from image" },
+        "enterprise": { "title": "Eti Browni Intense Cikolatali Dolgulu Kek 160g - Tek Porsiyon, 4 Adet", "changes": "Full enrichment + serving + piece count" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Eti", "size": "160g" },
+        "pro":        { "brand": "Eti", "size": "160g", "variant": "Browni Intense", "type": "Kek" },
+        "plus":       { "brand": "Eti", "size": "160g", "variant": "Browni Intense", "type": "Cikolatali Kek", "filling": "Dolgulu" },
+        "enterprise": { "brand": "Eti", "size": "160g", "variant": "Browni Intense", "type": "Cikolatali Kek", "filling": "Dolgulu", "servings": "4", "origin": "Turkey" }
+      },
+      "categoryPrediction": { "l1": "Gida ve Icecek", "l2": "Atistirmalik", "l3": "Kek ve Pasta", "confidence": 0.91 }
+    },
+    {
+      "id": "MPC-700001",
+      "platform": "talabat",
+      "brand": "Indomie",
+      "vendor": "Quick Stop Lahore",
+      "vendorTier": "lite",
+      "country": "Pakistan",
+      "category": "packaged_food_beverages",
+      "rawTitle": "indomie instant noodls chicken 5x75g",
+      "titleProblems": ["no capitalization", "typo: noodls -> Noodles"],
+      "enrichment": {
+        "lite":       { "title": "Indomie Instant Noodles Chicken 5x75g", "changes": "Title case + typo fixed" },
+        "pro":        { "title": "Indomie Chicken Flavor Instant Noodles 5 Pack 75g Each", "changes": "Typo fixed + flavor repositioned + pack size clarified" },
+        "plus":       { "title": "Indomie Chicken Flavor Instant Noodles Multi-Pack 5x75g (375g Total)", "changes": "Pack type + total weight added" },
+        "enterprise": { "title": "Indomie Chicken Flavor Instant Noodles Multi-Pack 5x75g (375g Total) - Halal Certified", "changes": "Full enrichment + certification from image" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Indomie", "size": "5x75g" },
+        "pro":        { "brand": "Indomie", "size": "5x75g", "flavor": "Chicken", "type": "Instant Noodles", "packType": "Multi-Pack" },
+        "plus":       { "brand": "Indomie", "size": "5x75g", "flavor": "Chicken", "type": "Instant Noodles", "packType": "Multi-Pack", "totalWeight": "375g" },
+        "enterprise": { "brand": "Indomie", "size": "5x75g", "flavor": "Chicken", "type": "Instant Noodles", "packType": "Multi-Pack", "totalWeight": "375g", "halal": "Yes", "origin": "Indonesia" }
+      },
+      "categoryPrediction": { "l1": "Food & Beverages", "l2": "Pantry", "l3": "Instant Noodles", "confidence": 0.96 }
+    },
+    {
+      "id": "MPC-700002",
+      "platform": "talabat",
+      "brand": "Dettol",
+      "vendor": "Baqala Express",
+      "vendorTier": "lite",
+      "country": "UAE",
+      "category": "packaged_non_food",
+      "rawTitle": "DETTOL SOAP BAR 120G",
+      "titleProblems": ["ALL CAPS", "missing variant (original/skincare/cool)"],
+      "enrichment": {
+        "lite":       { "title": "Dettol Soap Bar 120g", "changes": "Title case applied" },
+        "pro":        { "title": "Dettol Original Antibacterial Soap Bar 120g", "changes": "Title case + variant (Original) + descriptor (Antibacterial)" },
+        "plus":       { "title": "Dettol Original Antibacterial Bar Soap 120g - Skin Protection", "changes": "Full descriptor + benefit claim" },
+        "enterprise": { "title": "Dettol Original Antibacterial Bar Soap 120g - Skin Protection, Pine Fragrance", "changes": "Full enrichment + fragrance from image OCR" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Dettol", "size": "120g" },
+        "pro":        { "brand": "Dettol", "size": "120g", "variant": "Original", "type": "Antibacterial Soap" },
+        "plus":       { "brand": "Dettol", "size": "120g", "variant": "Original", "type": "Antibacterial Bar Soap", "benefit": "Skin Protection" },
+        "enterprise": { "brand": "Dettol", "size": "120g", "variant": "Original", "type": "Antibacterial Bar Soap", "benefit": "Skin Protection", "fragrance": "Pine", "origin": "UK" }
+      },
+      "categoryPrediction": { "l1": "Non-Food", "l2": "Personal Care", "l3": "Bar Soap", "confidence": 0.94 }
+    },
+    {
+      "id": "MPC-700003",
+      "platform": "talabat",
+      "brand": "Nescafe",
+      "vendor": "Carrefour Hypermarket",
+      "vendorTier": "enterprise",
+      "country": "UAE",
+      "category": "packaged_food_beverages",
+      "rawTitle": "nescafe dolce gusto cappuccino 16 caps",
+      "titleProblems": ["no capitalization", "caps is informal (Capsules)"],
+      "enrichment": {
+        "lite":       { "title": "Nescafe Dolce Gusto Cappuccino 16 Caps", "changes": "Title case applied" },
+        "pro":        { "title": "Nescafe Dolce Gusto Cappuccino Coffee Capsules 16 Pack", "changes": "Title case + product type + pack clarified" },
+        "plus":       { "title": "Nescafe Dolce Gusto Cappuccino Coffee Capsules 16 Pack (8 Servings)", "changes": "Product type + serving count (16 caps = 8 servings for cappuccino)" },
+        "enterprise": { "title": "Nescafe Dolce Gusto Cappuccino Premium Coffee Capsules 16 Pack (8 Servings) - Compatible with Dolce Gusto Machines", "changes": "Full enrichment + compatibility + premium descriptor" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Nescafe", "size": "16 Capsules" },
+        "pro":        { "brand": "Nescafe", "size": "16 Capsules", "flavor": "Cappuccino", "type": "Coffee Capsules", "line": "Dolce Gusto" },
+        "plus":       { "brand": "Nescafe", "size": "16 Capsules", "flavor": "Cappuccino", "type": "Coffee Capsules", "line": "Dolce Gusto", "servings": "8" },
+        "enterprise": { "brand": "Nescafe", "size": "16 Capsules", "flavor": "Cappuccino", "type": "Coffee Capsules", "line": "Dolce Gusto", "servings": "8", "compatibility": "Dolce Gusto Machines", "origin": "Germany" }
+      },
+      "categoryPrediction": { "l1": "Food & Beverages", "l2": "Hot Beverages", "l3": "Coffee Capsules", "confidence": 0.97 }
+    },
+    {
+      "id": "MPC-700004",
+      "platform": "talabat",
+      "brand": "Voltaren",
+      "vendor": "Carrefour Hypermarket",
+      "vendorTier": "enterprise",
+      "country": "UAE",
+      "category": "pharmaceuticals",
+      "rawTitle": "voltaren emulgel 100g anti inflammatory",
+      "titleProblems": ["no capitalization", "anti inflammatory should be hyphenated", "missing strength/concentration"],
+      "enrichment": {
+        "lite":       { "title": "Voltaren Emulgel 100g Anti-Inflammatory", "changes": "Title case + hyphen fixed" },
+        "pro":        { "title": "Voltaren Emulgel Anti-Inflammatory Pain Relief Gel 100g", "changes": "Title case + product type clarified + restructured" },
+        "plus":       { "title": "Voltaren Emulgel 1% Anti-Inflammatory Pain Relief Gel 100g", "changes": "Concentration added + full product type" },
+        "enterprise": { "title": "Voltaren Emulgel 1% (Diclofenac) Anti-Inflammatory Topical Pain Relief Gel 100g - For Joint & Muscle Pain", "changes": "Full enrichment + active ingredient + indication + application type" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Voltaren", "size": "100g" },
+        "pro":        { "brand": "Voltaren", "size": "100g", "type": "Anti-Inflammatory Gel", "form": "Topical Gel" },
+        "plus":       { "brand": "Voltaren", "size": "100g", "type": "Anti-Inflammatory Gel", "form": "Topical Gel", "concentration": "1%", "activeIngredient": "Diclofenac" },
+        "enterprise": { "brand": "Voltaren", "size": "100g", "type": "Anti-Inflammatory Gel", "form": "Topical Gel", "concentration": "1%", "activeIngredient": "Diclofenac", "indication": "Joint & Muscle Pain", "otc": "Yes" }
+      },
+      "categoryPrediction": { "l1": "Health & Pharmacy", "l2": "Pain Relief", "l3": "Topical Pain Relief", "confidence": 0.88 }
+    },
+    {
+      "id": "MPC-800001",
+      "platform": "pedidosya",
+      "brand": "La Serenisima",
+      "vendor": "Coto Digital",
+      "vendorTier": "plus",
+      "country": "Argentina",
+      "category": "packaged_food_beverages",
+      "rawTitle": "la serenisima leche entera 1lt sachet",
+      "titleProblems": ["no capitalization", "wrong unit (lt -> L)", "sachet is uncommon term for milk bag"],
+      "enrichment": {
+        "lite":       { "title": "La Serenisima Leche Entera 1L Sachet", "changes": "Title case + unit normalized" },
+        "pro":        { "title": "Leche Entera La Serenisima Sachet 1L", "changes": "Generic-first format + restructured" },
+        "plus":       { "title": "Leche Entera Pasteurizada La Serenisima Sachet 1L", "changes": "Generic-first + processing type (Pasteurizada)" },
+        "enterprise": { "title": "Leche Entera Pasteurizada La Serenisima Sachet 1L - Refrigerar, Contiene Lactosa", "changes": "Full enrichment + storage + allergen" }
+      },
+      "attributes": {
+        "lite":       { "brand": "La Serenisima", "size": "1L" },
+        "pro":        { "brand": "La Serenisima", "size": "1L", "fat": "Entera (Full Fat)", "type": "Leche", "packaging": "Sachet" },
+        "plus":       { "brand": "La Serenisima", "size": "1L", "fat": "Entera (Full Fat)", "type": "Leche Pasteurizada", "packaging": "Sachet", "origin": "Argentina" },
+        "enterprise": { "brand": "La Serenisima", "size": "1L", "fat": "Entera (Full Fat)", "type": "Leche Pasteurizada", "packaging": "Sachet", "origin": "Argentina", "storage": "Refrigerar", "allergens": "Lactosa" }
+      },
+      "categoryPrediction": { "l1": "Alimentos y Bebidas", "l2": "Lacteos", "l3": "Leche Fresca", "confidence": 0.95 }
+    },
+    {
+      "id": "MPC-800002",
+      "platform": "pedidosya",
+      "brand": "Bimbo",
+      "vendor": "Almacen Don Pedro",
+      "vendorTier": "lite",
+      "country": "Argentina",
+      "category": "packaged_food_beverages",
+      "rawTitle": "bimbo pan lactal blanco 350gr",
+      "titleProblems": ["no capitalization", "wrong unit (gr -> g)", "missing descriptor (familiar/chico)"],
+      "enrichment": {
+        "lite":       { "title": "Bimbo Pan Lactal Blanco 350g", "changes": "Title case + unit normalized (gr -> g)" },
+        "pro":        { "title": "Pan Lactal Bimbo Blanco 350g", "changes": "Generic-first format + restructured" },
+        "plus":       { "title": "Pan Lactal Bimbo Blanco Chico 350g", "changes": "Generic-first + size descriptor (Chico)" },
+        "enterprise": { "title": "Pan Lactal Bimbo Blanco Chico 350g - Sin Conservantes Artificiales", "changes": "Full enrichment + preservative claim from packaging" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Bimbo", "size": "350g" },
+        "pro":        { "brand": "Bimbo", "size": "350g", "variant": "Blanco", "type": "Pan Lactal" },
+        "plus":       { "brand": "Bimbo", "size": "350g", "variant": "Blanco", "type": "Pan Lactal", "sizeDesc": "Chico" },
+        "enterprise": { "brand": "Bimbo", "size": "350g", "variant": "Blanco", "type": "Pan Lactal", "sizeDesc": "Chico", "preservatives": "Sin Conservantes Artificiales" }
+      },
+      "categoryPrediction": { "l1": "Alimentos y Bebidas", "l2": "Panaderia", "l3": "Pan Lactal", "confidence": 0.94 }
+    },
+    {
+      "id": "MPC-800003",
+      "platform": "yemeksepeti",
+      "brand": "Torku",
+      "vendor": "BIM Market",
+      "vendorTier": "pro",
+      "country": "Turkey",
+      "category": "packaged_food_beverages",
+      "rawTitle": "torku banada kakaolu findik kremasi 400gr",
+      "titleProblems": ["no capitalization", "wrong unit (gr -> g)"],
+      "enrichment": {
+        "lite":       { "title": "Torku Banada Kakaolu Findik Kremasi 400g", "changes": "Title case + unit normalized" },
+        "pro":        { "title": "Torku Banada Kakaolu Findik Kremasi Kavanoz 400g", "changes": "Title case + packaging type (Kavanoz/Jar)" },
+        "plus":       { "title": "Torku Banada Kakaolu Findik Kremasi Kavanoz 400g", "changes": "Same as Pro (already well-structured)" },
+        "enterprise": { "title": "Torku Banada Kakaolu Findik Kremasi Kavanoz 400g - Helal Sertifikali", "changes": "Full enrichment + halal certification" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Torku", "size": "400g" },
+        "pro":        { "brand": "Torku", "size": "400g", "variant": "Banada", "type": "Findik Kremasi", "flavor": "Kakaolu" },
+        "plus":       { "brand": "Torku", "size": "400g", "variant": "Banada", "type": "Findik Kremasi", "flavor": "Kakaolu", "packaging": "Kavanoz" },
+        "enterprise": { "brand": "Torku", "size": "400g", "variant": "Banada", "type": "Findik Kremasi", "flavor": "Kakaolu", "packaging": "Kavanoz", "halal": "Yes", "origin": "Turkey" }
+      },
+      "categoryPrediction": { "l1": "Gida ve Icecek", "l2": "Kahvaltilik", "l3": "Surme Cikolata ve Krema", "confidence": 0.93 }
+    },
+    {
+      "id": "MPC-900001",
+      "platform": "talabat",
+      "brand": "Pampers",
+      "vendor": "FreshMart Regional",
+      "vendorTier": "pro",
+      "country": "UAE",
+      "category": "packaged_non_food",
+      "rawTitle": "pampers baby dry size 4 44 diapers",
+      "titleProblems": ["no capitalization", "verbose (diapers is redundant with Pampers)"],
+      "enrichment": {
+        "lite":       { "title": "Pampers Baby Dry Size 4 44 Diapers", "changes": "Title case applied" },
+        "pro":        { "title": "Pampers Baby-Dry Diapers Size 4 (9-14 kg) 44 Count", "changes": "Title case + weight range added + count standardized" },
+        "plus":       { "title": "Pampers Baby-Dry Diapers Size 4 Maxi (9-14 kg) 44 Count - Up to 12h Dryness", "changes": "Size name + benefit claim" },
+        "enterprise": { "title": "Pampers Baby-Dry Diapers Size 4 Maxi (9-14 kg) 44 Count - Up to 12h Dryness, Dermatologically Tested", "changes": "Full enrichment + safety claim from packaging" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Pampers", "count": "44" },
+        "pro":        { "brand": "Pampers", "count": "44", "size": "4", "weightRange": "9-14 kg", "line": "Baby-Dry" },
+        "plus":       { "brand": "Pampers", "count": "44", "size": "4 (Maxi)", "weightRange": "9-14 kg", "line": "Baby-Dry", "benefit": "Up to 12h Dryness" },
+        "enterprise": { "brand": "Pampers", "count": "44", "size": "4 (Maxi)", "weightRange": "9-14 kg", "line": "Baby-Dry", "benefit": "Up to 12h Dryness", "safety": "Dermatologically Tested" }
+      },
+      "categoryPrediction": { "l1": "Non-Food", "l2": "Baby Care", "l3": "Diapers", "confidence": 0.99 }
+    },
+    {
+      "id": "MPC-900002",
+      "platform": "talabat",
+      "brand": "Downy",
+      "vendor": "Quick Stop Lahore",
+      "vendorTier": "lite",
+      "country": "Pakistan",
+      "category": "packaged_non_food",
+      "rawTitle": "downy fabric softner 1l blue",
+      "titleProblems": ["no capitalization", "typo: softner -> Softener", "color instead of scent name"],
+      "enrichment": {
+        "lite":       { "title": "Downy Fabric Softener 1L Blue", "changes": "Title case + typo fixed" },
+        "pro":        { "title": "Downy Valley Dew Fabric Softener 1L", "changes": "Typo fixed + color replaced with scent name (Valley Dew = blue variant)" },
+        "plus":       { "title": "Downy Valley Dew Concentrated Fabric Softener 1L", "changes": "Scent name + formula type (Concentrated)" },
+        "enterprise": { "title": "Downy Valley Dew Concentrated Fabric Softener 1L - Long-Lasting Freshness, 40 Washes", "changes": "Full enrichment + benefit + usage count from image" }
+      },
+      "attributes": {
+        "lite":       { "brand": "Downy", "size": "1L" },
+        "pro":        { "brand": "Downy", "size": "1L", "scent": "Valley Dew", "type": "Fabric Softener" },
+        "plus":       { "brand": "Downy", "size": "1L", "scent": "Valley Dew", "type": "Concentrated Fabric Softener", "washes": "~40" },
+        "enterprise": { "brand": "Downy", "size": "1L", "scent": "Valley Dew", "type": "Concentrated Fabric Softener", "washes": "~40", "benefit": "Long-Lasting Freshness" }
+      },
+      "categoryPrediction": { "l1": "Non-Food", "l2": "Cleaning", "l3": "Fabric Softener", "confidence": 0.92 }
+    }
+  ],
+
+  "variantGroupExample": {
+    "description": "Products that should be grouped as variants of the same product family. Variant grouping only happens at Plus and Enterprise tiers.",
+    "groupName": "Almarai Full Fat Milk",
+    "brand": "Almarai",
+    "variants": [
+      { "id": "MPC-300001", "rawTitle": "almarai full fat milk 500ml", "size": "500mL", "tier": "plus" },
+      { "id": "MPC-100001", "rawTitle": "almarai full fat milk 1L", "size": "1L", "tier": "lite" },
+      { "id": "MPC-200001", "rawTitle": "almarai full fat milk 2L", "size": "2L", "tier": "pro" },
+      { "id": "MPC-400007", "rawTitle": "almarai full fat milk 3L", "size": "3L", "tier": "enterprise" }
+    ],
+    "variantAttribute": "size",
+    "appExperience": "Customer sees a variant picker: 500mL / 1L / 2L / 3L on one product page instead of 4 separate listings"
+  },
+
+  "categoryPredictionExamples": {
+    "description": "Examples showing correct predictions, wrong predictions, and the correction flow.",
+    "correct": [
+      { "product": "Almarai Full Fat Milk 1L", "predicted": "Dairy > Fresh Milk", "confidence": 0.94, "outcome": "accepted" },
+      { "product": "Pepsi Can 330mL", "predicted": "Beverages > Carbonated Drinks", "confidence": 0.97, "outcome": "accepted" }
+    ],
+    "wrong": [
+      { "product": "Nescafe Dolce Gusto Cappuccino 16 Capsules", "predicted": "Beverages > Instant Coffee", "correct": "Hot Beverages > Coffee Capsules", "confidence": 0.62, "reason": "Model sees 'Nescafe' and defaults to instant coffee. Misses that Dolce Gusto capsules are a separate L3 category." },
+      { "product": "Galaxy Smooth Milk Chocolate Bar 90g", "predicted": "Snacks > Biscuits & Cookies", "correct": "Snacks > Chocolate Bars", "confidence": 0.58, "reason": "Low-confidence prediction. AutoML (V1, text-only) cannot distinguish chocolate bars from biscuits without image signal." },
+      { "product": "Voltaren Emulgel 100g", "predicted": "Personal Care > Body Lotion", "correct": "Health & Pharmacy > Topical Pain Relief", "confidence": 0.44, "reason": "Gel format confuses the model. Category 'Topical Pain Relief' has zero ground truth examples in the golden dataset." }
+    ]
+  },
+
+  "correctionPatterns": {
+    "description": "Common correction patterns that content agents repeat daily because corrections never feed back.",
+    "patterns": [
+      { "pattern": "Add '1 Piece'", "frequency": "19-34% of all corrections", "example": "Title missing piece count for single items", "fixable": true },
+      { "pattern": "Fix unit format", "frequency": "~12% of corrections", "example": "'330 ML' -> '330mL', '1 lt' -> '1L'", "fixable": true },
+      { "pattern": "Add missing size", "frequency": "~8% of corrections", "example": "Title has no weight/volume", "fixable": false },
+      { "pattern": "Brand name correction", "frequency": "~6% of corrections", "example": "'coca cola' -> 'Coca-Cola', 'head and shoulders' -> 'Head & Shoulders'", "fixable": true }
+    ]
+  }
+}

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dynamic Content Strategy — Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Kalam:wght@300;400;700&family=Architects+Daughter&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f6f1e6;
+    --paper-2: #efe8d6;
+    --ink: #1a1814;
+    --ink-soft: #4a4640;
+    --ink-faint: #8a857a;
+    --rule: #2a261e;
+    --red: #c5392b;
+    --red-soft: #e9a399;
+    --green: #2f7a4a;
+    --green-soft: #a8ce96;
+    --amber: #d99a2b;
+    --blue: #3a6ea5;
+    --tape: #e8d77a;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Kalam', 'Caveat', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body {
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(0,0,0,0.015) 0, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(0,0,0,0.015) 0, transparent 50%),
+      repeating-linear-gradient(0deg, transparent 0, transparent 38px, rgba(58, 110, 165, 0.06) 38px, rgba(58, 110, 165, 0.06) 39px);
+  }
+  #root { min-height: 100vh; }
+
+  .hand { font-family: 'Kalam', sans-serif; }
+  .hand-light { font-family: 'Kalam', sans-serif; font-weight: 300; }
+  .hand-bold { font-family: 'Kalam', sans-serif; font-weight: 700; }
+  .marker { font-family: 'Caveat', cursive; font-weight: 600; }
+  .marker-bold { font-family: 'Caveat', cursive; font-weight: 700; }
+  .label { font-family: 'Architects Daughter', cursive; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* Sketchy borders via SVG filter */
+  .sketch {
+    border: 2px solid var(--rule);
+    background: var(--paper);
+    position: relative;
+  }
+  .sketch-rough {
+    border: 2.5px solid var(--rule);
+    border-radius: 4px 16px 6px 14px / 12px 4px 16px 6px;
+    background: var(--paper);
+  }
+  .sketch-card {
+    border: 2px solid var(--rule);
+    border-radius: 6px 12px 4px 10px / 8px 4px 12px 6px;
+    background: var(--paper);
+    box-shadow: 2px 3px 0 rgba(26,24,20,0.12);
+  }
+  .sketch-card.problem {
+    border-color: var(--red);
+    background: #fbe9e6;
+  }
+  .sketch-card.solved {
+    border-color: var(--green);
+    background: #e6f1de;
+  }
+  .sketch-card.solution {
+    border-color: var(--green);
+    background: #effae7;
+  }
+
+  /* Wobble borders for variety */
+  .wobble-1 { border-radius: 10px 4px 12px 6px / 4px 10px 6px 12px; }
+  .wobble-2 { border-radius: 6px 14px 4px 10px / 12px 4px 14px 6px; }
+  .wobble-3 { border-radius: 4px 8px 14px 6px / 8px 14px 4px 12px; }
+
+  .strike { position: relative; }
+  .strike::after {
+    content: ""; position: absolute; left: -4px; right: -4px; top: 50%;
+    height: 2.5px; background: var(--rule);
+    transform: rotate(-2deg);
+    transform-origin: left center;
+  }
+  .strike-red::after { background: var(--red); }
+  .strike-green::after { background: var(--green); }
+
+  .crossed { opacity: 0.55; }
+
+  /* Tape */
+  .tape {
+    position: absolute;
+    background: var(--tape);
+    width: 80px; height: 22px;
+    opacity: 0.78;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  }
+
+  /* Arrow + check sketches */
+  .check::before {
+    content: "✓";
+    color: var(--green);
+    font-weight: 800;
+    font-family: 'Kalam', sans-serif;
+    margin-right: 6px;
+  }
+
+  /* Underline highlight */
+  .hi {
+    background: linear-gradient(180deg, transparent 60%, rgba(232, 215, 122, 0.7) 60%);
+    padding: 0 2px;
+  }
+  .hi-red {
+    background: linear-gradient(180deg, transparent 60%, rgba(197, 57, 43, 0.25) 60%);
+  }
+
+  /* Buttons */
+  button.nav {
+    font-family: 'Kalam', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    background: var(--paper);
+    color: var(--ink);
+    border: 2px solid var(--rule);
+    border-radius: 8px 20px 6px 16px / 14px 6px 20px 8px;
+    padding: 10px 18px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 rgba(26,24,20,0.18);
+    transition: transform 0.1s ease;
+  }
+  button.nav:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 rgba(26,24,20,0.22); }
+  button.nav:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 rgba(26,24,20,0.18); }
+  button.nav:disabled { opacity: 0.35; cursor: not-allowed; }
+  button.nav.primary { background: var(--ink); color: var(--paper); }
+
+  .scroll-hide::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scroll-hide::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 4px; }
+
+  @keyframes wiggleIn {
+    0% { transform: scale(0.9) rotate(-2deg); opacity: 0; }
+    60% { transform: scale(1.04) rotate(1deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+  .wiggle-in { animation: wiggleIn 360ms ease-out both; }
+
+  @keyframes drawStrike {
+    from { transform: scaleX(0) rotate(-2deg); }
+    to { transform: scaleX(1) rotate(-2deg); }
+  }
+
+  /* Sticky ledger arrow */
+  .arrow-svg { stroke: var(--rule); stroke-width: 2; fill: none; }
+
+  /* Print-friendly */
+  @media print {
+    .no-print { display: none !important; }
+    body { background: white; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="content.jsx"></script>
+<script type="text/babel" src="steps.jsx"></script>
+<script type="text/babel" src="walkthrough.jsx"></script>
+</body>
+</html>

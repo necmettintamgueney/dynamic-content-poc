@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dynamic Content Strategy — Executive Walkthrough</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="assets/dh-logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Surfaces */
+    --bg:        #FAFAF7;
+    --surface:   #FFFFFF;
+    --surface-2: #F4F4EF;
+    --surface-3: #ECECE5;
+
+    /* Ink */
+    --ink:        #1B1F2A;
+    --ink-soft:   #4A5260;
+    --ink-mute:   #6B7280;
+    --ink-faint:  #9BA0AB;
+    --border:     #E4E4DD;
+    --border-strong: #CFCFC6;
+
+    /* Brand */
+    --dh-red:     #D61F26;
+    --dh-red-2:   #B71920;
+    --red-tint:   #FCE8E9;
+    --red-edge:   #F2C9CB;
+
+    /* Status */
+    --green:      #00A86B;
+    --green-2:    #008C58;
+    --green-tint: #E4F6EC;
+    --green-edge: #BFE5CF;
+
+    --amber:      #C8870D;
+    --amber-tint: #FBF0D6;
+    --amber-edge: #ECCF93;
+
+    --blue:       #0066B3;
+    --blue-2:     #004F8C;
+    --blue-tint:  #E1EEF7;
+    --blue-edge:  #B7D6EC;
+
+    --purple:     #7B3FA0;
+    --purple-tint:#F1E7F8;
+
+    /* Tier accents (subtle, neutral-ish) */
+    --t-lite:        #6B7280;
+    --t-lite-tint:   #EEEEF1;
+    --t-pro:         #0066B3;
+    --t-pro-tint:    #E1EEF7;
+    --t-plus:        #7B3FA0;
+    --t-plus-tint:   #F1E7F8;
+    --t-ent:         #B07005;
+    --t-ent-tint:    #FBF0D6;
+
+    /* Type */
+    --font: "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+
+    --radius-sm: 6px;
+    --radius:    10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+
+    --shadow-1: 0 1px 2px rgba(20,22,30,0.04), 0 1px 1px rgba(20,22,30,0.03);
+    --shadow-2: 0 4px 14px -6px rgba(20,22,30,0.10), 0 2px 4px rgba(20,22,30,0.04);
+    --shadow-3: 0 12px 32px -12px rgba(20,22,30,0.16), 0 4px 10px rgba(20,22,30,0.04);
+  }
+
+  /* Dark theme override */
+  html[data-theme="dark"] {
+    --bg:        #0F1117;
+    --surface:   #181B24;
+    --surface-2: #20242F;
+    --surface-3: #2A2F3B;
+    --ink:        #ECEDF1;
+    --ink-soft:   #B9BDC9;
+    --ink-mute:   #8A8F9A;
+    --ink-faint:  #6B7280;
+    --border:     #2A2F3B;
+    --border-strong: #3A4050;
+    --red-tint:   #2D1318;
+    --red-edge:   #5A2127;
+    --green-tint: #0F2A1E;
+    --green-edge: #1F4F38;
+    --amber-tint: #2C2210;
+    --amber-edge: #5A4419;
+    --blue-tint:  #0E2236;
+    --blue-edge:  #1A4067;
+    --purple-tint:#23163A;
+    --t-lite-tint:   #1F2230;
+    --t-pro-tint:    #0E2236;
+    --t-plus-tint:   #23163A;
+    --t-ent-tint:    #2C2210;
+    --shadow-1: 0 1px 2px rgba(0,0,0,0.4);
+    --shadow-2: 0 4px 16px -6px rgba(0,0,0,0.5);
+    --shadow-3: 0 12px 32px -12px rgba(0,0,0,0.6);
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font);
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    min-height: 100vh;
+  }
+  body { font-feature-settings: "ss01", "ss02", "cv11"; }
+  #root { min-height: 100vh; }
+
+  /* Typography helpers */
+  .mono { font-family: var(--mono); font-feature-settings: "calt", "liga"; }
+  .eyebrow {
+    font-family: var(--font);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  /* Hairline divider */
+  .hairline { height: 1px; background: var(--border); }
+
+  /* Focus */
+  button:focus-visible, a:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--dh-red);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Scrollbars */
+  .scroll-hide::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scroll-hide::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+  .scroll-hide::-webkit-scrollbar-track { background: transparent; }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+  }
+  @keyframes drawTick {
+    from { stroke-dashoffset: 24; }
+    to   { stroke-dashoffset: 0; }
+  }
+  @keyframes ledgerStrike {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+  }
+  @keyframes pulseDot {
+    0%, 100% { transform: scale(1); opacity: 0.85; }
+    50%      { transform: scale(1.3); opacity: 1; }
+  }
+  @keyframes flowDot {
+    from { offset-distance: 0%; }
+    to   { offset-distance: 100%; }
+  }
+  @keyframes morphIn {
+    from { opacity: 0; transform: translateY(6px); filter: blur(2px); }
+    to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+  }
+  @keyframes morphOut {
+    from { opacity: 1; transform: translateY(0); filter: blur(0); }
+    to   { opacity: 0; transform: translateY(-6px); filter: blur(2px); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes spinSlow { to { transform: rotate(360deg); } }
+
+  .fade-up { animation: fadeUp 360ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  .fade-in { animation: fadeIn 240ms ease-out both; }
+
+  /* Print */
+  @media print {
+    .no-print { display: none !important; }
+    body { background: white; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="wt-data.jsx"></script>
+<script type="text/babel" src="wt-ui.jsx"></script>
+<script type="text/babel" src="wt-steps.jsx"></script>
+<script type="text/babel" src="wt-app.jsx"></script>
+</body>
+</html>
