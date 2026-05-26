@@ -9,6 +9,7 @@ function Intro() {
       padding: "100px 28px 64px",
       maxWidth: 1180, margin: "0 auto",
       display: "flex", flexDirection: "column", justifyContent: "center",
+      overflow: "hidden",
     }}>
       <div className="fade-up" style={{ display: "inline-flex", alignSelf: "flex-start", alignItems: "center", gap: 8, padding: "5px 12px", border: "1px solid var(--border)", background: "var(--surface)", borderRadius: 999, marginBottom: 22 }}>
         <span style={{ width: 7, height: 7, background: "var(--dh-red)", borderRadius: "50%", animation: "pulseDot 1.8s ease-in-out infinite" }}/>
@@ -78,6 +79,7 @@ function Outro() {
       padding: "80px 28px 100px",
       maxWidth: 1180, margin: "0 auto",
       textAlign: "center",
+      overflow: "hidden",
     }}>
       <div className="eyebrow" style={{ color: "var(--green-2)", marginBottom: 14 }}>End of demo</div>
       <h2 style={{

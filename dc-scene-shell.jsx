@@ -33,6 +33,7 @@ function Scene({ id, num, total, kicker, title, lede, message, children, eyebrow
         background: bg || "transparent",
         display: "flex", flexDirection: "column", justifyContent: "center",
         scrollMarginTop: 64,
+        overflow: "hidden",
       }}>
       <div className="scene-inner" style={{ maxWidth: 1180, margin: "0 auto", width: "100%" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
@@ -47,7 +48,7 @@ function Scene({ id, num, total, kicker, title, lede, message, children, eyebrow
           margin: 0, fontFamily: "var(--font)", fontWeight: 700,
           fontSize: "clamp(36px, 5vw, 56px)", lineHeight: 1.05,
           letterSpacing: "-0.025em", color: "var(--ink)", textWrap: "balance",
-          maxWidth: 900,
+          maxWidth: 900, overflowWrap: "anywhere",
         }}>{title}</h2>
         {lede && (
           <p style={{
