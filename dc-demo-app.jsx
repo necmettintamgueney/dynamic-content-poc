@@ -64,9 +64,8 @@ function SideRail({ activeId }) {
   return (
     <nav className="rail">
       {scenes.map(s => (
-        <a key={s.id} href={`#${s.id}`} className={activeId === s.id ? "active" : ""}>
+        <a key={s.id} href={`#${s.id}`} className={activeId === s.id ? "active" : ""} title={`${String(s.num).padStart(2, "0")} · ${s.title.split(".")[0]}`}>
           <span className="dot"/>
-          <span className="label">{String(s.num).padStart(2, "0")} · {s.title.split(".")[0]}</span>
         </a>
       ))}
     </nav>
