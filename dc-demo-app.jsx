@@ -6,8 +6,8 @@ function Intro() {
   return (
     <section style={{
       minHeight: "84vh",
-      padding: "100px 28px 64px",
-      maxWidth: 1180, margin: "0 auto",
+      padding: "100px clamp(28px, 5vw, 80px) 64px",
+      maxWidth: 1060, margin: "0 auto",
       display: "flex", flexDirection: "column", justifyContent: "center",
       overflow: "hidden",
     }}>
@@ -75,8 +75,8 @@ function SideRail({ activeId }) {
 function Outro() {
   return (
     <section style={{
-      padding: "80px 28px 100px",
-      maxWidth: 1180, margin: "0 auto",
+      padding: "80px clamp(28px, 5vw, 80px) 100px",
+      maxWidth: 1060, margin: "0 auto",
       textAlign: "center",
       overflow: "hidden",
     }}>

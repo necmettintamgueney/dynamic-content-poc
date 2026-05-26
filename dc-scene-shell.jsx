@@ -29,13 +29,13 @@ function Scene({ id, num, total, kicker, title, lede, message, children, eyebrow
       className={`scene ${inView ? "is-active" : ""}`}
       style={{
         minHeight: "100vh",
-        padding: "100px 28px 80px",
+        padding: "100px clamp(28px, 5vw, 80px) 80px",
         background: bg || "transparent",
         display: "flex", flexDirection: "column", justifyContent: "center",
         scrollMarginTop: 64,
         overflow: "hidden",
       }}>
-      <div className="scene-inner" style={{ maxWidth: 1180, margin: "0 auto", width: "100%" }}>
+      <div className="scene-inner" style={{ maxWidth: 1060, margin: "0 auto", width: "100%" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
           <SceneBadge num={num} tone={eyebrowTone}/>
           <div className="eyebrow" style={{ color: toneColor(eyebrowTone) }}>{kicker}</div>
