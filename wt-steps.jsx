@@ -589,7 +589,7 @@ function DemoCategoryExplorer() {
 
       <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 12 }}>
         <Tag tone="red" mono>~2,400 / wk</Tag>
-        <div style={{ fontSize: 13, color: "var(--ink-mute)" }}>agent overrides happen weekly · zero feed back to the model</div>
+        <div style={{ fontSize: 13, color: "var(--ink-mute)" }}>agent overrides happen weekly · zero feedback to the model</div>
       </div>
     </Card>);
 
@@ -997,7 +997,7 @@ function DemoTierLadder() {
         border: `1px solid ${t.color}33`,
         borderTop: `3px solid ${t.color}`,
         borderRadius: "var(--radius)"
-      }} data-comment-anchor="4c4146e663-div-822-7">
+      }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, gap: 8, flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <TierDot tierId={t.id} size={10} />
@@ -1034,7 +1034,7 @@ function DemoTierLadder() {
       </div>
 
       <div style={{ marginTop: 14, fontSize: 13, color: "var(--ink-mute)", lineHeight: 1.55 }}>
-        <strong style={{ color: "var(--ink-soft)" }}>Try it:</strong> toggle tier above and switch product. Every tier on every product. The dataset has all 30.
+        <strong style={{ color: "var(--ink-soft)" }}>Try it:</strong> toggle tier above and switch product. Every tier on every product — pick one below to explore.
       </div>
     </Card>);
 
@@ -1404,7 +1404,7 @@ function DemoValidationGate() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 18 }}>
         {VALIDATION_AGENTS.map((a, i) =>
         <div key={i} style={{ padding: 14, background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "var(--radius)" }}>
-            <div className="eyebrow" tone="blue" style={{ marginBottom: 6 }}>Agent {i + 1}</div>
+            <div className="eyebrow" style={{ marginBottom: 6, color: "var(--blue-2)" }}>Agent {i + 1}</div>
             <div style={{ fontWeight: 600, fontSize: 14, color: "var(--ink)" }}>{a.name}</div>
             <div style={{ marginTop: 8, fontSize: 12.5, color: "var(--ink-mute)", fontStyle: "italic", lineHeight: 1.5 }}>"{a.q}"</div>
           </div>

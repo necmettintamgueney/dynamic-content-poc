@@ -58,7 +58,7 @@ const PROBLEMS = [
   {
     id: "P8", num: 8, system: "category",
     title: "Lost Corrections (Category)",
-    headline: "Agents override 2,400 categories a week. Zero feed back.",
+    headline: "Agents override 2,400 categories a week. Zero feedback.",
     metric: { value: "~2,400/wk", label: "overrides → 0 used to improve the model" },
     blurb: "When a content agent rejects a category and assigns the right one, the correction is applied to the product — but never flows back to the model. The same wrong prediction comes back next week.",
     hurts: ["Agents — same overrides repeatedly", "Customers — products miscategorized until manual fix"],
@@ -249,6 +249,9 @@ const PRODUCTS = [
       enterprise: "Galaxy Smooth Milk Chocolate Bar 90g — Single Serve, Contains Milk & Soy",
     },
     attrs: {
+      lite: { Brand: "Galaxy" },
+      pro: { Brand: "Galaxy", Size: "90g" },
+      plus: { Brand: "Galaxy", Size: "90g", Flavor: "Milk Chocolate", Type: "Bar" },
       enterprise: { Brand: "Galaxy", Size: "90g", Flavor: "Milk Chocolate", Type: "Bar", Allergens: "Milk, Soy", Servings: "1" },
     },
     category: "Food & Beverages › Snacks & Confectionery › Chocolate Bars",

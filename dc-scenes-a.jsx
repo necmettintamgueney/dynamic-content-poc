@@ -174,7 +174,7 @@ function SceneModelStore() {
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 90px 90px 80px", gap: 0, alignItems: "stretch" }}>
-            {["Task", "Current model", "Accuracy", "$ / 1k", "ms"].map((h, i) => (
+            {["Task", "Current model", "Accuracy", "¢ / 1k", "ms"].map((h, i) => (
               <div key={i} className="eyebrow" style={{ padding: "8px 12px", borderBottom: "1px solid var(--border)", textAlign: i >= 2 ? "right" : "left" }}>{h}</div>
             ))}
             {tasks.map((t, i) => {
