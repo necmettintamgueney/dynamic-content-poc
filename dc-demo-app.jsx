@@ -19,8 +19,8 @@ function Intro() {
       <h1 className="fade-up" style={{
         margin: 0, fontFamily: "var(--font)", fontWeight: 800,
         fontSize: "clamp(48px, 7vw, 92px)", lineHeight: 1.02,
-        letterSpacing: "-0.035em", color: "var(--ink)", textWrap: "balance",
-        maxWidth: 1050,
+        letterSpacing: "-0.035em", color: "var(--ink)",
+        maxWidth: 1050, overflowWrap: "anywhere",
         animationDelay: "60ms",
       }}>
         How a messy vendor upload becomes an enriched, categorized listing.
@@ -85,7 +85,7 @@ function Outro() {
       <h2 style={{
         margin: 0, fontFamily: "var(--font)", fontWeight: 800,
         fontSize: "clamp(40px, 5vw, 64px)", lineHeight: 1.03,
-        letterSpacing: "-0.03em", color: "var(--ink)", textWrap: "balance",
+        letterSpacing: "-0.03em", color: "var(--ink)",
       }}>
         One pipeline. <span style={{ color: "var(--green-2)" }}>Every content task.</span>
       </h2>

@@ -47,13 +47,13 @@ function Scene({ id, num, total, kicker, title, lede, message, children, eyebrow
         <h2 style={{
           margin: 0, fontFamily: "var(--font)", fontWeight: 700,
           fontSize: "clamp(36px, 5vw, 56px)", lineHeight: 1.05,
-          letterSpacing: "-0.025em", color: "var(--ink)", textWrap: "balance",
+          letterSpacing: "-0.025em", color: "var(--ink)",
           maxWidth: 900, overflowWrap: "anywhere",
         }}>{title}</h2>
         {lede && (
           <p style={{
             margin: "18px 0 0", fontSize: 19, lineHeight: 1.5,
-            color: "var(--ink-soft)", maxWidth: 760, fontWeight: 400, textWrap: "pretty",
+            color: "var(--ink-soft)", maxWidth: 760, fontWeight: 400,
           }}>{lede}</p>
         )}
 
