@@ -132,7 +132,7 @@ function App() {
   }, []);
 
   return (
-    <div>
+    <div style={{ overflowX: "hidden" }}>
       <TopNav active="demo"/>
       <SideRail activeId={activeId}/>
       <Intro/>

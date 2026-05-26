@@ -149,6 +149,7 @@ function DCCard({ children, padded = true, style = {}, accent, className = "" })
       borderRadius: "var(--radius-lg)",
       padding: padded ? 22 : 0,
       boxShadow: "var(--shadow-1)",
+      overflow: "hidden",
       ...style,
     }}>{children}</div>
   );

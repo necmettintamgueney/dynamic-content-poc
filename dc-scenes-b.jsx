@@ -518,7 +518,8 @@ function SceneCost() {
         {/* LEFT — tier mix table */}
         <DCCard padded>
           <div className="eyebrow" style={{ marginBottom: 14 }}>Tiered mix · 1,000,000 products</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 60px 100px 90px 90px", gap: 0 }}>
+          <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 60px 100px 90px 90px", gap: 0, minWidth: 460 }}>
             {["Tier", "Mix", "Products", "Per product", "Total"].map((h, i) => (
               <div key={i} className="eyebrow" style={{ padding: "8px 10px", borderBottom: "1px solid var(--border)", textAlign: i >= 1 ? "right" : "left" }}>{h}</div>
             ))}
@@ -542,6 +543,7 @@ function SceneCost() {
             <div className="mono" style={{ padding: "14px 10px", textAlign: "right", fontSize: 13, color: "var(--ink-soft)" }}>1,000,000</div>
             <div></div>
             <div className="mono" style={{ padding: "14px 10px", textAlign: "right", fontSize: 18, fontWeight: 700, color: "var(--green-2)" }}>{fmtUSD(tieredTotal)}</div>
+          </div>
           </div>
         </DCCard>
 
