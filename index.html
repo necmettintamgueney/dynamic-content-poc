@@ -89,40 +89,24 @@
 <script type="text/babel" src="dc-brand.jsx"></script>
 <script type="text/babel">
 const TEAM = [
-  { name: "Necmettin Tamgüney", role: "Product Lead",          tint: "var(--red-tint)",    edge: "var(--red-edge)",    accent: "var(--dh-red)" },
-  { name: "Sarvesh Patil",       role: "Engineering Lead",     tint: "var(--blue-tint)",    edge: "var(--blue-edge)",    accent: "var(--blue)" },
-  { name: "Ameer Hamza",         role: "Senior ML Engineer",   tint: "var(--purple-tint)",  edge: "#D9C2E8",             accent: "var(--purple)" },
-  { name: "Bhavya Jain",         role: "Senior Data Scientist", tint: "var(--amber-tint)",  edge: "var(--amber-edge)",   accent: "var(--amber)" },
-  { name: "Gabriel Straub",      role: "Senior Backend Engineer", tint: "var(--green-tint)", edge: "var(--green-edge)",  accent: "var(--green-2)" },
-  { name: "Amit Sharma",         role: "Senior Backend Engineer", tint: "var(--blue-tint)",  edge: "var(--blue-edge)",   accent: "var(--blue)" },
-  { name: "Nikhil Kulkarni",     role: "Backend Engineer",     tint: "var(--surface-2)",    edge: "var(--border-strong)", accent: "var(--ink-soft)" },
-  { name: "Prashanth M",         role: "Backend Engineer",     tint: "var(--red-tint)",    edge: "var(--red-edge)",    accent: "var(--dh-red)" },
+  { name: "Fahad Yousaf",        role: "Machine Learning Engineer",  photo: "assets/team-fahad.png" },
+  { name: "Katerina Itopoulos",  role: "Associate Data Scientist",   photo: "assets/team-katerina.png" },
+  { name: "Kuldeep Kumar",       role: "Manager, Data Science",      photo: "assets/team-kuldeep.png" },
+  { name: "Mundher Al-Shabi",    role: "Senior Data Scientist",      photo: "assets/team-mundher.png" },
+  { name: "Necmettin Tamgüney",  role: "Senior Product Manager",     photo: "assets/team-necmettin.png" },
+  { name: "Saloni Jain",         role: "Data Scientist",             photo: "assets/team-saloni.png" },
 ];
 
-function initialsOf(name) {
-  return name.split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
-}
-
-function Avatar({ name, tint, edge, accent, size = 96 }) {
-  // Circular avatar with brand-tinted gradient bg + initials.
+function Avatar({ photo, name, size = 96 }) {
   return (
     <div style={{
       width: size, height: size, borderRadius: "50%",
-      background: `radial-gradient(ellipse at 30% 30%, var(--surface) 0%, ${tint} 70%)`,
-      border: `1px solid ${edge}`,
-      display: "flex", alignItems: "center", justifyContent: "center",
-      position: "relative", overflow: "hidden",
+      overflow: "hidden",
+      border: "2px solid var(--border)",
       boxShadow: "var(--shadow-1)",
     }}>
-      <span style={{
-        fontFamily: "var(--font)", fontWeight: 700,
-        fontSize: size * 0.32, color: accent,
-        letterSpacing: "-0.02em",
-      }}>{initialsOf(name)}</span>
-      {/* subtle ring */}
-      <div style={{
-        position: "absolute", inset: 4,
-        borderRadius: "50%", border: `1px dashed ${edge}`, opacity: 0.5,
+      <img src={photo} alt={name} style={{
+        width: "100%", height: "100%", objectFit: "cover",
       }}/>
     </div>
   );
@@ -265,13 +249,13 @@ function Team() {
         <div className="eyebrow">Behind the work</div>
         <h2 style={{ margin: "10px 0 0", fontSize: 44, fontWeight: 700, letterSpacing: "-0.025em", color: "var(--ink)" }}>Our team</h2>
         <p style={{ marginTop: 10, fontSize: 16, color: "var(--ink-mute)", maxWidth: 540, marginLeft: "auto", marginRight: "auto" }}>
-          The product, engineering, and ML group building Dynamic Content for Delivery Hero.
+          The product, data science, and ML group building Dynamic Content for Delivery Hero.
         </p>
       </div>
 
       <div style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+        gridTemplateColumns: "repeat(3, 1fr)",
         gap: 14,
       }}>
         {TEAM.map((m, i) => (
@@ -284,7 +268,7 @@ function Team() {
             animationDelay: `${i * 50}ms`,
             boxShadow: "var(--shadow-1)",
           }}>
-            <Avatar name={m.name} tint={m.tint} edge={m.edge} accent={m.accent} size={84}/>
+            <Avatar photo={m.photo} name={m.name} size={84}/>
             <div style={{ marginTop: 14, fontSize: 15, fontWeight: 600, color: "var(--ink)", letterSpacing: "-0.005em" }}>{m.name}</div>
             <div style={{ marginTop: 4, fontSize: 12.5, color: "var(--ink-mute)" }}>{m.role}</div>
           </div>
