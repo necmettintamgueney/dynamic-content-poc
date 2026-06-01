@@ -44,7 +44,7 @@ function Ledger({ idx, onGoto }) {
   return (
     <aside style={{
       position: "sticky", top: 24, alignSelf: "start",
-      width: 270,
+      width: 290,
       maxHeight: "calc(100vh - 48px)",
       overflowY: "auto",
       padding: 18,
@@ -90,7 +90,7 @@ function Ledger({ idx, onGoto }) {
                 if (probIdx >= 0) onGoto(probIdx);
               }}
               style={{
-                display: "grid", gridTemplateColumns: "18px 26px 1fr", gap: 8, alignItems: "center",
+                display: "grid", gridTemplateColumns: "18px 24px 1fr", gap: 6, alignItems: "center",
                 padding: "6px 8px",
                 background: bg,
                 border: `1px solid ${(isCur || isResolvingNow) ? (isResolvingNow ? "var(--green-edge)" : "var(--red-edge)") : "transparent"}`,
@@ -325,7 +325,7 @@ function App() {
         maxWidth: 1400, margin: "0 auto",
         padding: "28px 32px 0",
         display: "grid",
-        gridTemplateColumns: ledgerVisible ? "minmax(0, 1fr) 290px" : "minmax(0, 1fr)",
+        gridTemplateColumns: ledgerVisible ? "minmax(0, 1fr) 310px" : "minmax(0, 1fr)",
         gap: 32,
         alignItems: "start",
       }}>

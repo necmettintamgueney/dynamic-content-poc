@@ -418,23 +418,14 @@ function ClosedLoopDiagram({ width = 720, height = 360, autoPlay = true, highlig
 
 function ResolvedText({ children, resolved, animate = true }) {
   return (
-    <span style={{ position: "relative", display: "inline-block" }}>
-      <span style={{
-        color: resolved ? "var(--ink-mute)" : "var(--ink)",
-        opacity: resolved ? 0.7 : 1,
-        transition: "color 320ms ease, opacity 320ms ease",
-      }}>{children}</span>
-      {resolved && (
-        <span style={{
-          position: "absolute", left: -1, right: -1, top: "calc(50% + 0px)",
-          height: 1.5,
-          background: "var(--green-2)",
-          transformOrigin: "left center",
-          animation: animate ? "ledgerStrike 320ms ease-out forwards" : undefined,
-          transform: animate ? "scaleX(0)" : "scaleX(1)",
-        }}/>
-      )}
-    </span>
+    <span style={{
+      color: resolved ? "var(--ink-mute)" : "var(--ink)",
+      opacity: resolved ? 0.7 : 1,
+      textDecoration: resolved ? "line-through" : "none",
+      textDecorationColor: "var(--green-2)",
+      textDecorationThickness: 1.5,
+      transition: "color 320ms ease, opacity 320ms ease",
+    }}>{children}</span>
   );
 }
 
