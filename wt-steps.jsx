@@ -635,21 +635,20 @@ function DemoGroundTruth() {
 
 }
 
-// ---- P10 Env var governance ----
+// ---- P10 No model governance ----
 function DemoEnvVar() {
   return (
     <Card padded>
       <Eyebrow style={{ marginBottom: 14 }}>How model selection actually works</Eyebrow>
       <div className="mono" style={{ background: "var(--ink)", color: "#E2E8F0", padding: 16, borderRadius: "var(--radius)", fontSize: 12.5, lineHeight: 1.8 }}>
-        <div style={{ color: "#94A3B8" }}># config/talabat-uae.env</div>
-        <div>CATEGORY_MODEL=<span style={{ color: "#FCA5A5" }}>automl_text_v1</span></div>
-        <div style={{ marginTop: 10, color: "#94A3B8" }}># config/pedidosya-ar.env</div>
-        <div>CATEGORY_MODEL=<span style={{ color: "#86EFAC" }}>embedding_v2</span></div>
-        <div style={{ marginTop: 10, color: "#94A3B8" }}># config/yemeksepeti-tr.env</div>
-        <div>CATEGORY_MODEL=<span style={{ color: "#FCA5A5" }}>automl_text_v1</span></div>
+        <div style={{ color: "#94A3B8" }}># config/models.yaml</div>
+        <div>title_generation: <span style={{ color: "#FCA5A5" }}>gpt-4.1-mini</span>  <span style={{ color: "#94A3B8" }}># picked in Q3 2024</span></div>
+        <div>attribute_extraction: <span style={{ color: "#FCA5A5" }}>gpt-4.1-mini</span>  <span style={{ color: "#94A3B8" }}># "good enough"</span></div>
+        <div>category_prediction: <span style={{ color: "#86EFAC" }}>embed-v2</span>  <span style={{ color: "#94A3B8" }}># all regions</span></div>
+        <div>variant_grouping: <span style={{ color: "#FCA5A5" }}>gpt-4.1-mini</span>  <span style={{ color: "#94A3B8" }}># never re-evaluated</span></div>
       </div>
       <div style={{ marginTop: 16, fontSize: 13.5, color: "var(--ink-mute)", fontStyle: "italic", lineHeight: 1.55 }}>
-        Two model versions coexist. Region assignment is a config commit. No A/B test, no comparison, no rollback.
+        Every task locked to a manually chosen model. No benchmark, no comparison, no automatic rotation when something better ships.
       </div>
     </Card>);
 

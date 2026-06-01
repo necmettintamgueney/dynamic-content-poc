@@ -72,11 +72,11 @@ const PROBLEMS = [
     hurts: ["Engineering — can't evaluate improvements", "Business — no confidence in accuracy claims"],
   },
   {
-    id: "P10", num: 10, system: "category",
+    id: "P10", num: 10, system: "both",
     title: "No Model Governance",
-    headline: "Which model serves which region is an environment variable.",
-    blurb: "Two category-prediction models coexist — AutoML (text-only) and embedding-based (text + image). Which region uses which is set in a config file. No A/B testing, no comparison, no data-driven selection.",
-    hurts: ["Engineering — ad-hoc decisions", "Platform teams — inconsistent accuracy across regions"],
+    headline: "Which model runs which task is a manual decision with no feedback loop.",
+    blurb: "Model selection across all content tasks — title generation, attribute extraction, category prediction, variant grouping — is a manual config choice. No A/B testing, no benchmark comparison, no data-driven rotation. When a better model ships, someone has to notice, evaluate, and switch it by hand.",
+    hurts: ["Engineering — ad-hoc decisions on model selection", "Platform teams — inconsistent quality across tasks and regions"],
   },
 ];
 
@@ -291,8 +291,8 @@ const PREDICTIONS = [
     predicted: "Food & Beverages › Snacks › Biscuits & Cookies",
     truth:     "Food & Beverages › Snacks › Chocolate Bars",
     confidence: 0.58,
-    why: "AutoML v1 (text-only) cannot distinguish chocolate bars from biscuits without image signal. Region is on AutoML by env-var config.",
-    fix: "Model Store selects embedding-based model (text + image) for this tier. Production Accuracy Monitoring would have caught the regional gap.",
+    why: "Embedding model lacks image signal for this product — text alone cannot distinguish chocolate bars from biscuits. No benchmark flagged the gap.",
+    fix: "Model Store benchmarks text-only vs multimodal models per task. Production Accuracy Monitoring would have caught the category-level drop.",
   },
   {
     id: "pred-5", correct: false,
@@ -341,7 +341,7 @@ const QA_LAYERS = [
 const MODEL_STORE_TASKS = [
   { task: "Title Generation",      lite: "DH-v3",   pro: "4.1-mini", plus: "Sonnet",  ent: "GPT-4.1" },
   { task: "Attribute Extraction",  lite: "DH-v3",   pro: "4.1-mini", plus: "Sonnet",  ent: "GPT-4.1" },
-  { task: "Category Prediction",   lite: "AutoML",  pro: "Embed-v2", plus: "Embed-v2", ent: "Embed-v2" },
+  { task: "Category Prediction",   lite: "Embed-v1", pro: "Embed-v2", plus: "Embed-v2", ent: "Embed-v2" },
   { task: "Variant Grouping",      lite: "—",       pro: "4.1-mini", plus: "Sonnet",  ent: "GPT-4.1" },
   { task: "Image Analysis",        lite: "—",       pro: "—",        plus: "Sonnet",  ent: "GPT-4.1" },
 ];
