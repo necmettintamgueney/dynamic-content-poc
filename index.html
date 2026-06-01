@@ -77,6 +77,18 @@
     50%      { transform: translateY(-4px); }
   }
   .fade-up { animation: fadeUp 520ms cubic-bezier(0.2,0.7,0.2,1) both; }
+
+  .team-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 28px -8px rgba(20,22,30,0.13), 0 4px 10px rgba(20,22,30,0.05);
+    border-color: var(--border-strong);
+  }
+  .team-card:hover img {
+    transform: scale(1.08);
+  }
+  .team-card img {
+    transition: transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
 </style>
 </head>
 <body>
@@ -158,19 +170,6 @@ function Hero() {
         </a>
       </div>
 
-      <div className="fade-up" style={{ marginTop: 56, display: "inline-flex", flexWrap: "wrap", gap: 28, justifyContent: "center", animationDelay: "320ms" }}>
-        {[
-          { v: "2", l: "AI systems unified" },
-          { v: "10", l: "problems closed out" },
-          { v: "4", l: "investment tiers" },
-          { v: "3", l: "platforms · 70+ countries" },
-        ].map((s, i) => (
-          <div key={i} style={{ textAlign: "left", padding: "4px 14px", borderLeft: i === 0 ? "none" : "1px solid var(--border)" }}>
-            <div style={{ fontWeight: 700, fontSize: 28, color: "var(--ink)", letterSpacing: "-0.02em" }}>{s.v}</div>
-            <div style={{ fontSize: 12, color: "var(--ink-mute)", marginTop: 2 }}>{s.l}</div>
-          </div>
-        ))}
-      </div>
     </section>
   );
 }
@@ -248,9 +247,6 @@ function Team() {
       <div style={{ marginBottom: 40, textAlign: "center" }}>
         <div className="eyebrow">Behind the work</div>
         <h2 style={{ margin: "10px 0 0", fontSize: 44, fontWeight: 700, letterSpacing: "-0.025em", color: "var(--ink)" }}>Our team</h2>
-        <p style={{ marginTop: 10, fontSize: 16, color: "var(--ink-mute)", maxWidth: 540, marginLeft: "auto", marginRight: "auto" }}>
-          The product, data science, and ML group building Dynamic Content for Delivery Hero.
-        </p>
       </div>
 
       <div style={{
@@ -259,7 +255,7 @@ function Team() {
         gap: 14,
       }}>
         {TEAM.map((m, i) => (
-          <div key={m.name} className="fade-up" style={{
+          <div key={m.name} className="fade-up team-card" style={{
             padding: 22,
             background: "var(--surface)",
             border: "1px solid var(--border)",
@@ -267,6 +263,8 @@ function Team() {
             display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center",
             animationDelay: `${i * 50}ms`,
             boxShadow: "var(--shadow-1)",
+            transition: "transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 320ms ease, border-color 320ms ease",
+            cursor: "default",
           }}>
             <Avatar photo={m.photo} name={m.name} size={84}/>
             <div style={{ marginTop: 14, fontSize: 15, fontWeight: 600, color: "var(--ink)", letterSpacing: "-0.005em" }}>{m.name}</div>
