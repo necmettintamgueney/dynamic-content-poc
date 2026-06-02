@@ -24,13 +24,13 @@ Open `Walkthrough.html`. Use arrow keys or click to advance.
 
 ---
 
-### P1: Budget Unknown Before Design
+### P1: No Cost Signal Before Design
 
-> We design enrichment solutions before we know what they can cost. A 50-product local shop and a 10,000-product strategic partner get the same approach. Engineering builds options that were never financially viable.
+> Enrichment cost isn't part of the product decision. Whether a product is a top-seller driving significant GMV or a niche item in a single store, it enters the same pipeline at the same cost. The system has no way to match investment to expected return before work begins.
 
 ### P2: Uniform Investment per Product
 
-> Every product gets the same model, the same QA depth, the same cost. A long-tail SKU with 10 views a month gets identical treatment to a best-seller with 100,000 views. Strategic partners' top products are not differentiated from local-shop noise.
+> Every product gets the same model, the same QA depth, the same cost. A long-tail SKU with 10 views a month gets identical treatment to a best-seller with 100,000 views. There's no mechanism to invest more in high-return products or less in low-traffic ones.
 
 ### P3: High Title Correction Rate
 
@@ -38,15 +38,15 @@ Open `Walkthrough.html`. Use arrow keys or click to advance.
 
 ### P4: Slow Model Evaluation
 
-> Each new model evaluation is its own engineering project. There's no standard benchmark, no automated comparison. Meanwhile, better and cheaper models ship every week, and we're stuck on the last one someone had time to evaluate.
+> The system was built around a single model. There's no abstraction for benchmarking or swapping, so each evaluation requires custom engineering. This isn't a team gap -- it's missing infrastructure. Better, cheaper models ship every week, but there's no standard way to test them.
 
 ### P5: No Production Observability
 
-> Quality problems are discovered weeks late, by accident. A bad model update degrades the catalog silently. There is no live quality signal -- the first indicator is usually agents complaining about rising queue volume.
+> The pipeline was built to generate content, not to measure its quality over time. Observability wasn't scoped into the original design. There's no live quality signal -- a bad model update degrades the catalog silently until agents notice rising queue volumes.
 
 ### P6: Slow Reaction, Minor Fixes Ignored
 
-> Even when we know about a problem, shipping a fix is another dev cycle. Small recurring issues -- adding "1 Piece", unit spacing, ALL-CAPS normalization -- never reach the top of any backlog. Agents develop workarounds instead of getting real fixes.
+> There's no lightweight path to fix known patterns. Every change -- even adding "1 Piece" or normalizing ALL-CAPS -- requires a dev cycle that competes with feature work. The prioritization framework treats these as low-severity, so they accumulate. Agents develop workarounds instead of getting real fixes.
 
 ### P7: Static Golden Dataset
 
@@ -78,7 +78,7 @@ Open `Walkthrough.html`. Use arrow keys or click to advance.
 
 ### S1: Tiered Onboarding
 
-> The first solution. Before any content work begins, the vendor's tier sets the investment envelope. Lite for local shops -- baseline hygiene, cheapest model, minimal QA. Enterprise for strategic partners -- best model, image verification, trust-class QA. The tier picks the model, the QA depth, and the enrichment level upfront. Budget is known before design.
+> The first solution. Before any content work begins, a tier sets the investment envelope. Lite for baseline hygiene -- cheapest model, minimal QA. Enterprise for strategic products -- best model, image verification, trust-class QA. The tier picks the model, the QA depth, and the enrichment level upfront. Cost is known before design.
 
 *[Interactive: toggle between products and tiers to show the title morphing at each level]*
 
