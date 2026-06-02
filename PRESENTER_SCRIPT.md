@@ -38,15 +38,15 @@ Open `Walkthrough.html`. Use arrow keys or click to advance.
 
 ### P4: Slow Model Evaluation
 
-> The system was built around a single model. There's no abstraction for benchmarking or swapping, so each evaluation requires custom engineering. This isn't a team gap -- it's missing infrastructure. Better, cheaper models ship every week, but there's no standard way to test them.
+> There's no infrastructure to benchmark or swap models. The system was built around a single model with no abstraction layer, so each evaluation requires custom engineering. This isn't a team gap -- it's missing infrastructure. Better, cheaper models ship every week, but there's no standard way to test them.
 
 ### P5: No Production Observability
 
-> The pipeline was built to generate content, not to measure its quality over time. Observability wasn't scoped into the original design. There's no live quality signal -- a bad model update degrades the catalog silently until agents notice rising queue volumes.
+> There's no live quality signal built into the pipeline. It was built to generate content, not to measure its quality over time. Observability wasn't scoped into the original design. A bad model update degrades the catalog silently until agents notice rising queue volumes.
 
 ### P6: Slow Reaction, Minor Fixes Ignored
 
-> There's no lightweight path to fix known patterns. Every change -- even adding "1 Piece" or normalizing ALL-CAPS -- requires a dev cycle that competes with feature work. The prioritization framework treats these as low-severity, so they accumulate. Agents develop workarounds instead of getting real fixes.
+> There's no lightweight path to fix known, recurring patterns. Every change -- even adding "1 Piece" or normalizing ALL-CAPS -- requires a dev cycle that competes with feature work. The prioritization framework treats these as low-severity, so they accumulate. Agents develop workarounds instead of getting real fixes.
 
 ### P7: Static Golden Dataset
 

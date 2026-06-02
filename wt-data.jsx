@@ -27,7 +27,7 @@ const PROBLEMS = [
   {
     id: "P4", num: 4, system: "both",
     title: "Slow Model Evaluation",
-    headline: "Each new model is its own development project.",
+    headline: "No infrastructure to benchmark or swap models.",
     metric: { value: "months", label: "per evaluation cycle" },
     blurb: "The system was built around a single model. There is no abstraction for benchmarking or swapping — so each evaluation requires custom engineering. This isn't a team gap; it's missing infrastructure. Better, cheaper models ship every week, but there's no standard way to test them.",
     hurts: ["Engineering — repetitive custom work with no reusable framework", "Business — paying for outdated models while better ones exist"],
@@ -35,7 +35,7 @@ const PROBLEMS = [
   {
     id: "P5", num: 5, system: "both",
     title: "No Production Observability",
-    headline: "Quality problems are discovered weeks late, by accident.",
+    headline: "No live quality signal built into the pipeline.",
     metric: { value: "weeks", label: "from regression to detection" },
     blurb: "The pipeline was built to generate content, not to measure its quality over time. Observability wasn't scoped into the original design, so there is no live quality signal. A bad model update degrades the catalog silently until agents notice rising queue volumes.",
     hurts: ["Agents — rising workload, no explanation", "Customers — silent quality decay"],
@@ -43,7 +43,7 @@ const PROBLEMS = [
   {
     id: "P6", num: 6, system: "enrichment",
     title: "Slow Reaction, Minor Fixes Ignored",
-    headline: "Recurring small problems sit in a backlog for months.",
+    headline: "No lightweight path to fix known, recurring patterns.",
     blurb: "There is no lightweight path to fix known patterns. Every change — even adding \"1 Piece\" or normalizing ALL-CAPS — requires a dev cycle that competes with feature work. The prioritization framework treats these as low-severity, so they accumulate. Agents develop workarounds instead of getting real fixes.",
     hurts: ["Agents — permanent friction from unfixed patterns", "Customers — persistent low-quality patterns that erode trust"],
   },
