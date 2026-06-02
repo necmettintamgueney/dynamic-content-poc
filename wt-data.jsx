@@ -85,13 +85,13 @@ const SOLUTIONS = [
     id: "S1", num: 1,
     title: "Tiered Onboarding",
     resolves: ["P1", "P2"],
-    blurb: "Vendor tier sets the investment envelope before any content work begins. The tier picks the model, the QA depth, and the enrichment level — Lite for local shops, Enterprise for strategic partners.",
+    blurb: "A tier sets the investment envelope before any content work begins. The tier picks the model, the QA depth, and the enrichment level — scaled to the expected return of each product.",
   },
   {
     id: "S2", num: 2,
     title: "ROI Override",
     resolves: ["P2"],
-    blurb: "Expected return refines the tier per product. A high-value brand at a Lite vendor gets promoted to Pro. A long-tail SKU at an Enterprise vendor stays cheap. Fine adjustment on top of coarse tiering.",
+    blurb: "Expected return refines the tier per product. A top-seller starting at Lite gets promoted to Pro. A low-traffic SKU starting at Enterprise stays cheap. Fine adjustment on top of coarse tiering.",
   },
   {
     id: "S3", num: 3,
@@ -140,10 +140,10 @@ const SOLUTIONS = [
 
 // Tier metadata (in order of investment).
 const TIERS = [
-  { id: "lite",       label: "Lite",       vendor: "Small local shop",       customer: "1 store",              model: "DH-Title v3 (fine-tuned)", cost: "$0.001", desc: "Baseline hygiene. Typos, caps, units.", color: "var(--t-lite)", tint: "var(--t-lite-tint)" },
-  { id: "pro",        label: "Pro",        vendor: "Regional chain",          customer: "50+ stores",           model: "GPT-4.1-mini",             cost: "$0.003", desc: "Category guidelines. Brand positioning.", color: "var(--t-pro)",  tint: "var(--t-pro-tint)" },
-  { id: "plus",       label: "Plus",       vendor: "National retailer",       customer: "200+ stores",          model: "Claude 4 Sonnet",          cost: "$0.015", desc: "Granular guidelines. Full variant dedup.", color: "var(--t-plus)", tint: "var(--t-plus-tint)" },
-  { id: "enterprise", label: "Enterprise", vendor: "Strategic partner",       customer: "Carrefour, Lulu, Panda", model: "GPT-4.1",                 cost: "$0.030", desc: "Best model. Image verification. Trust-class QA.", color: "var(--t-ent)",  tint: "var(--t-ent-tint)" },
+  { id: "lite",       label: "Lite",       vendor: "Baseline investment",     customer: "1 store",              model: "DH-Title v3 (fine-tuned)", cost: "$0.001", desc: "Baseline hygiene. Typos, caps, units.", color: "var(--t-lite)", tint: "var(--t-lite-tint)" },
+  { id: "pro",        label: "Pro",        vendor: "Standard investment",     customer: "50+ stores",           model: "GPT-4.1-mini",             cost: "$0.003", desc: "Category guidelines. Brand positioning.", color: "var(--t-pro)",  tint: "var(--t-pro-tint)" },
+  { id: "plus",       label: "Plus",       vendor: "High investment",         customer: "200+ stores",          model: "Claude 4 Sonnet",          cost: "$0.015", desc: "Granular guidelines. Full variant dedup.", color: "var(--t-plus)", tint: "var(--t-plus-tint)" },
+  { id: "enterprise", label: "Enterprise", vendor: "Premium investment",      customer: "Carrefour, Lulu, Panda", model: "GPT-4.1",                 cost: "$0.030", desc: "Best model. Image verification. Trust-class QA.", color: "var(--t-ent)",  tint: "var(--t-ent-tint)" },
 ];
 
 // Featured products for tier morphing & enrichment demos.

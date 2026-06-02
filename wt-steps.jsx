@@ -266,8 +266,8 @@ function DemoUniformInvestment() {
         "Coca-Cola Zero Sugar 330mL"
       </div>
       {[
-      { views: "10 views / month", desc: "Long-tail SKU at a local shop", cost: "$0.003" },
-      { views: "100,000 views / month", desc: "Top-seller at a strategic partner", cost: "$0.003" }].
+      { views: "10 views / month", desc: "Low-traffic niche item", cost: "$0.003" },
+      { views: "100,000 views / month", desc: "High-GMV top-seller", cost: "$0.003" }].
       map((row, i) =>
       <div key={i} style={{
         display: "grid", gridTemplateColumns: "1fr auto", alignItems: "center", gap: 16,
@@ -1039,8 +1039,8 @@ function DemoTierLadder() {
 // ---- S2 ROI override ----
 function DemoROIOverride() {
   const cases = [
-  { brand: "Coca-Cola", at: "Small local shop (Lite vendor)", from: "lite", to: "pro", reason: "Top-seller. Worth the investment." },
-  { brand: "Niche import sauce", at: "Carrefour (Enterprise vendor)", from: "enterprise", to: "lite", reason: "10 views/month. Premium model wasted." }];
+  { brand: "Coca-Cola", at: "Baseline tier (Lite)", from: "lite", to: "pro", reason: "Top-seller. Worth the investment." },
+  { brand: "Niche import sauce", at: "Premium tier (Enterprise)", from: "enterprise", to: "lite", reason: "10 views/month. Premium model wasted." }];
 
   return (
     <Card padded>
