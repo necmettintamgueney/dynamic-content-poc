@@ -232,29 +232,26 @@ function ProblemDemo({ problem }) {
   }
 }
 
-// ---- P1 Tier mismatch ----
+// ---- P1 No cost signal ----
 function DemoTierMismatch() {
   return (
     <Card padded>
-      <Eyebrow style={{ marginBottom: 14 }}>Today · same approach, regardless of value</Eyebrow>
+      <Eyebrow style={{ marginBottom: 14 }}>Today · same cost regardless of return</Eyebrow>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         {[
-        { vendor: "Al-Maha Mini Market", count: "~50 products", chip: "Small local shop", tone: "neutral" },
-        { vendor: "Carrefour Hypermarket", count: "~10,000 products", chip: "Strategic partner", tone: "amber" }].
+        { product: "Almarai Full Fat Milk 1L", signal: "Top-seller · high GMV contribution", chip: "High return", tone: "green" },
+        { product: "Niche Organic Tahini 200g", signal: "Low traffic · single-store listing", chip: "Low return", tone: "neutral" }].
         map((v, i) =>
         <div key={i} style={{ padding: 16, border: "1px solid var(--border)", borderRadius: "var(--radius)", background: "var(--surface-2)" }}>
             <Tag tone={v.tone}>{v.chip}</Tag>
-            <div style={{ fontWeight: 600, fontSize: 16, marginTop: 10 }}>{v.vendor}</div>
-            <div style={{ fontSize: 13, color: "var(--ink-mute)", marginTop: 2 }}>{v.count}</div>
-            <div className="mono" style={{ marginTop: 12, padding: "6px 8px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 6, fontSize: 12, color: "var(--ink-soft)" }}>
-              "Almarai Milk"
-            </div>
+            <div style={{ fontWeight: 600, fontSize: 16, marginTop: 10 }}>{v.product}</div>
+            <div style={{ fontSize: 13, color: "var(--ink-mute)", marginTop: 2 }}>{v.signal}</div>
             <div style={{ marginTop: 10, fontSize: 12, color: "var(--dh-red)", fontWeight: 600 }}>Same model · same QA · same cost</div>
           </div>
         )}
       </div>
       <div style={{ marginTop: 16, fontSize: 13.5, color: "var(--ink-mute)", lineHeight: 1.55, fontStyle: "italic" }}>
-        Effort spent on options that were never viable for the small shop — and premium not delivered to the partner who expects it.
+        The system has no cost signal. It cannot invest more in products that drive value or less in products that don't — regardless of which vendor uploaded them.
       </div>
     </Card>);
 
